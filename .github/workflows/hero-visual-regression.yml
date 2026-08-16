@@ -1,0 +1,212 @@
+name: Hero visual regression
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  hero-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright pillow
+          python -m playwright install --with-deps chromium firefox webkit
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start production server
+        run: |
+          npm run start &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:3000/ && exit 0
+            sleep 2
+          done
+          echo "server did not start"; exit 1
+
+      - name: Hero screenshot regression (all viewports)
+        id: hero
+        env:
+          # Comma-separated viewports to temporarily treat as known-flaky (non-blocking).
+          HERO_QUARANTINE: ""
+        run: |
+          python tests/hero-headline.py --profile nextjs --report tests/report-hero.json \
+            --retries 2 \
+            --quarantine "$HERO_QUARANTINE" \
+            --only mobile-320,mobile-375,mobile-414,tablet-768,tablet-1024,laptop-982,desktop-1280,desktop-1440,desktop-1600,desktop-1920
+
+      - name: FeaturedWork carousel padding assertions
+        if: always()
+        env:
+          # Optional subset, e.g. "mobile,tablet,desktop"; empty runs every breakpoint.
+          FEATURED_WORK_VIEWPORTS: ""
+        run: |
+          python tests/featured-work-padding.py --profile nextjs \
+            --report tests/report-featured-work.json \
+            --summary tests/report/featured-work-summary-nextjs.json \
+            ${FEATURED_WORK_VIEWPORTS:+--viewports "$FEATURED_WORK_VIEWPORTS"}
+
+      - name: FeaturedWork lightbox end-to-end checks
+        if: always()
+        run: python tests/featured-work-lightbox.py --report tests/report-lightbox.json
+
+      - name: FeaturedWork mobile carousel checks
+        if: always()
+        run: python tests/featured-work-carousel.py --report tests/report-carousel.json
+
+
+      - name: Mobile navigation behaviour + axe-core accessibility checks
+        if: always()
+        env:
+          # Comma-separated cases to treat as known-flaky (non-blocking):
+          # resize,navigation,aria-current,axe
+          MOBILE_NAV_QUARANTINE: ""
+        run: |
+          python tests/mobile-nav.py --timeout 90000 \
+            --retries 2 \
+            --quarantine "$MOBILE_NAV_QUARANTINE" \
+            --report tests/report-mobile-nav.json
+
+
+      - name: Header word mark a11y + layout + retina/zoom snapshots (chromium, firefox, webkit)
+        if: always()
+        run: |
+          python tests/header-logo.py \
+            --browsers chromium,firefox,webkit \
+            --report tests/report-header-logo.json
+
+      - name: Section semantics + axe audit (headings, landmarks, contrast)
+        if: always()
+        run: python tests/section-semantics.py --report tests/report-section-semantics.json
+
+      - name: Sitewide contrast ratios (pixel-sampled, AA)
+        if: always()
+        run: python tests/section-contrast.py --report tests/report-section-contrast.json
+
+      - name: Section-to-section transition snapshots
+        if: always()
+        env:
+          SECTION_QUARANTINE: ""
+        run: |
+          python tests/section-transitions.py --retries 2 \
+            --quarantine "$SECTION_QUARANTINE" \
+            --report tests/report-section-transitions.json
+
+      - name: Head metadata assertions
+        if: always()
+        run: python tests/head-metadata.py --profile nextjs --report tests/report-head.json
+
+      - name: Footer contact regression
+        if: always()
+        run: python tests/footer-contact.py --report tests/report-footer-contact.json
+
+      - name: Footer layout visual regression (all breakpoints)
+        id: footer_layout
+        if: always()
+        run: python tests/footer-layout.py --report tests/report-footer-layout.json
+
+      - name: Upload footer screenshot pairs and diffs (on failure)
+        if: always() && steps.footer_layout.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: footer-layout-failures
+          path: |
+            tests/report/footer-failures
+            tests/screenshots/footer
+            tests/baselines/footer
+            tests/diffs/footer
+            tests/report-footer-layout.json
+          if-no-files-found: warn
+
+      - name: Shared projects data integrity
+        if: always()
+        run: npm run test:data
+
+      - name: Footer accessibility (keyboard + screen reader)
+        if: always()
+        run: python tests/footer-a11y.py --report tests/report-footer-a11y.json
+
+      - name: Footer Work links resolve to the right lightbox
+        if: always()
+        run: python tests/footer-work-links.py --report tests/report-footer-work-links.json
+
+      - name: Unknown work slug fallback
+        if: always()
+        run: python tests/footer-work-invalid-slug.py --report tests/report-footer-invalid-slug.json
+
+      - name: Deep-link reload restores lightbox and focus
+        if: always()
+        run: python tests/footer-work-reload.py --report tests/report-footer-work-reload.json
+
+      - name: Sequential footer Work clicks show no stale lightbox content
+        if: always()
+        run: python tests/footer-work-sequence.py --report tests/report-footer-work-sequence.json
+
+      - name: Back/forward keeps lightbox state in sync
+        if: always()
+        run: python tests/footer-work-history.py --report tests/report-footer-work-history.json
+
+
+
+      - name: Upload screenshots and diffs
+        id: artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-visual-regression
+          path: |
+            tests/screenshots
+            tests/diffs
+            tests/report
+            tests/report-hero.json
+            tests/report-head.json
+            tests/report-featured-work.json
+            tests/report-mobile-nav.json
+            tests/report-lightbox.json
+            tests/report-carousel.json
+            tests/report-header-logo.json
+            tests/report-section-semantics.json
+            tests/report-section-contrast.json
+            tests/report-section-transitions.json
+            tests/report-footer-contact.json
+            tests/report-footer-layout.json
+            tests/report-footer-a11y.json
+            tests/report-footer-work-links.json
+            tests/report-footer-invalid-slug.json
+          if-no-files-found: ignore
+
+      - name: Build PR comment
+        if: always() && github.event_name == 'pull_request'
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python .github/scripts/hero_pr_comment.py > comment.md
+
+      - name: Comment on the pull request
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        continue-on-error: true
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: comment.md
+          edit-mode: replace

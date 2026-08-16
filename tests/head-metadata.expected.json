@@ -1,0 +1,21 @@
+{
+  "$comment": "Expected head metadata per route. Shared by the TanStack Start app and the Next.js harness so SEO output stays identical across both.",
+  "routes": [
+    {
+      "path": "/",
+      "title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
+      "meta": {
+        "name:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
+        "property:og:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
+        "property:og:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
+        "property:og:type": "website",
+        "property:og:url": "/",
+        "property:og:site_name": "Brand Ledger",
+        "name:twitter:card": "summary",
+        "name:twitter:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
+        "name:twitter:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies."
+      },
+      "canonical": "/"
+    }
+  ]
+}

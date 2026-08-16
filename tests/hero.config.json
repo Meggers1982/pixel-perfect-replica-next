@@ -1,0 +1,84 @@
+{
+  "$comment": "Harness-agnostic config for tests/hero-headline.py. Point baseUrl at any app that renders the hero (TanStack Start dev server, or a Next.js harness on :3000) \u2014 no code changes needed.",
+  "profiles": {
+    "tanstack": {
+      "baseUrl": "http://localhost:8080",
+      "path": "/"
+    },
+    "nextjs": {
+      "baseUrl": "http://localhost:3000",
+      "path": "/"
+    }
+  },
+  "defaultProfile": "nextjs",
+  "selectors": {
+    "hero": "section#top",
+    "headline": "h1",
+    "headlineLine": "span",
+    "label": "section#top p",
+    "cta": "section#top a[href=\"#contact\"]"
+  },
+  "expectedLines": [
+    "WE BUILD BRANDS",
+    "THAT BEHAVE",
+    "LIKE BUSINESSES"
+  ],
+  "paddingTolerance": 6,
+  "pixelThreshold": 12,
+  "maxDiffRatio": 0.005,
+  "retries": 2,
+  "retryDelayMs": 750,
+  "viewports": [
+    {
+      "name": "mobile-320",
+      "width": 320,
+      "height": 720
+    },
+    {
+      "name": "mobile-375",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "name": "mobile-414",
+      "width": 414,
+      "height": 896
+    },
+    {
+      "name": "tablet-768",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "name": "tablet-1024",
+      "width": 1024,
+      "height": 900
+    },
+    {
+      "name": "laptop-982",
+      "width": 982,
+      "height": 900
+    },
+    {
+      "name": "desktop-1280",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "name": "desktop-1440",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "desktop-1600",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "name": "desktop-1920",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "quarantine": []
+}
