@@ -1,6 +1,8 @@
 name: Hero visual regression
 
 on:
+  push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -167,6 +169,17 @@ jobs:
         run: python tests/footer-work-history.py --report tests/report-footer-work-history.json
 
 
+
+      - name: Upload recorded baselines
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # Suites record a baseline when one is missing and then pass, so a
+          # fresh baseline set is invisible unless it leaves the runner. Download
+          # this and commit it to turn the next run into a real comparison.
+          name: recorded-baselines
+          path: tests/baselines
+          if-no-files-found: ignore
 
       - name: Upload screenshots and diffs
         id: artifact

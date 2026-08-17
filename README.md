@@ -244,6 +244,19 @@ in shadcn's untouched `sidebar.tsx`. `eslint.config.mjs` documents each one.
 They are worth revisiting, but the Playwright suite pins the behaviour they
 produce, so they are warnings rather than errors.
 
+## CI
+
+`.github/workflows/hero-visual-regression.yml` runs the whole Playwright suite
+against a production build on `ubuntu-latest`, on pushes to `main`, on pull
+requests, and on demand.
+
+**Baselines that are missing get recorded and the suite passes.** That is what
+makes a first run green, and it is also a trap: a suite with no committed
+baseline compares nothing. The run uploads a `recorded-baselines` artifact for
+exactly this reason — download it, commit the contents, and the next run becomes
+a real comparison. Anything captured on a developer machine is the wrong
+platform (see below), so baselines should only ever be adopted from a CI run.
+
 ## Test baselines
 
 `tests/baselines/` still holds the PNGs recorded from the TanStack app on CI
