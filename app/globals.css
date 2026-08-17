@@ -23,8 +23,10 @@
  */
 
 @theme inline {
-  --font-display: "Anton", "Arial Narrow", sans-serif;
-  --font-body: "Barlow", Arial, sans-serif;
+  /* The *-Fallback families are metric-matched stand-ins (see app/fonts.css),
+     so the swap from fallback to webfont barely shifts the layout. */
+  --font-display: "Anton", "Anton Fallback", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", "Barlow Fallback", Arial, sans-serif;
   --color-cream: var(--cream);
   --color-ink: var(--ink);
   --color-accent: var(--accent);
@@ -209,6 +211,25 @@
   font-size: clamp(1.25rem, 2.8vw, 1.7rem);
 }
 
+/* Scroll cue at the base of the full-height hero. The travel is small on
+   purpose — it reads as a hint, not a bounce. The reduced-motion block above
+   collapses the animation for anyone who asked for less movement. */
+@keyframes scroll-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(0.3rem);
+    opacity: 1;
+  }
+}
+
+@utility scroll-cue {
+  animation: scroll-cue 2.4s ease-in-out infinite;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -230,11 +251,16 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Deterministic font loading and metric locking.
+   Font loading and metric locking.
 
-   Anton and Barlow are self-hosted (src/fonts.css -> /fonts/*.woff2) with
-   font-display: block and <link rel="preload">, so text only ever paints in the
-   real webfont. No swap, no local-font substitution, no CDN variance.
+   Anton and Barlow are self-hosted (app/fonts.css -> /fonts/*.woff2) with
+   font-display: swap and <link rel="preload">. No CDN variance. Text paints
+   immediately in a metric-matched fallback rather than staying invisible, and
+   the overrides in app/fonts.css keep the swap from moving the layout.
+
+   Screenshot runs stay deterministic because the harness waits on
+   document.fonts.ready and the data-fonts-ready flag before capturing, so a
+   frame is never taken mid-swap.
 --------------------------------------------------------------------------- */
 /* Lock the remaining text-metric inputs so rendering is identical run to run. */
 html {

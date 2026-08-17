@@ -52,10 +52,11 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
-// Anton/Barlow are self-hosted with font-display: block, so the first paint of
-// any text waits on these bytes — preload them alongside the document. 700 is
-// here because the About section sets several names in <strong>; without it
-// those words stay invisible after the rest of the paragraph has painted.
+// Anton/Barlow are self-hosted, so nothing discovers them until the stylesheet
+// is parsed — preload them alongside the document to shorten the window where
+// text renders in the fallback face. 700 is here because the About section sets
+// several names in <strong>, which would otherwise swap a beat after the rest
+// of the paragraph has settled.
 const PRELOADED_FONTS = [
   "/fonts/anton-400.woff2",
   "/fonts/barlow-400.woff2",

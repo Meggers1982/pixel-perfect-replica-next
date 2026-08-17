@@ -17,7 +17,11 @@ export function Hero() {
           height={1100}
           // The LCP element on every visit: fetch it ahead of the lazy pillars.
           fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
+          // A portrait phone crops this landscape frame to roughly its middle
+          // third, which lands on empty desk — the studio and the people sit
+          // right of centre. Bias the crop there until the viewport is wide
+          // enough to show them anyway.
+          className="absolute inset-0 h-full w-full object-cover object-[75%_50%] md:object-center"
         />
         {/* Scrim: directional wash that stays dense behind the copy on the left
             and clears toward the right so the photograph reads. The three layers
@@ -76,6 +80,33 @@ export function Hero() {
             </div>
           </div>
         </div>
+
+        {/* A full-height hero gives no visual signal that the page continues,
+            so mark the edge. It is a real link rather than decoration: an
+            affordance that looks clickable but cannot be reached by keyboard
+            is worse than none. Hidden on short viewports, where it would
+            crowd the CTAs. */}
+        <a
+          href="#services"
+          aria-label="Scroll to services"
+          className="group absolute inset-x-0 bottom-0 z-10 hidden [@media(min-height:640px)]:block"
+        >
+          <span className="mx-auto flex max-w-[1600px] items-center gap-3 px-5 pb-8 sm:px-8 sm:pb-10">
+            <span className="label-caps text-cream/70 transition-colors group-hover:text-cream">
+              Scroll
+            </span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 12 20"
+              className="scroll-cue h-5 w-3 text-cream/70 transition-colors group-hover:text-cream"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M6 0v18M1 13l5 5 5-5" />
+            </svg>
+          </span>
+        </a>
       </div>
     </section>
   );

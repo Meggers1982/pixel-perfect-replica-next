@@ -190,11 +190,50 @@ Two things followed from that:
 Vertical balance after the change is 213px above the headline / 201px below the
 CTAs at 1440x900, and 193/213 at 390x844.
 
+Two things followed from making it full-height:
+
+- **A scroll cue at the base.** A hero that fills the viewport gives no signal
+  that the page continues. It is a real link to `#services`, not decoration —
+  an affordance that looks clickable but cannot be reached by keyboard is worse
+  than none — and it is hidden below 640px of viewport height, where it would
+  crowd the CTAs.
+- **A mobile crop bias.** A portrait phone crops this landscape frame to roughly
+  its middle third, which landed on empty desk; the studio and the people sit
+  right of centre. `object-[75%_50%]` up to `md` puts them back in shot.
+
 Note that `tests/hero.config.json` raises `paddingTolerance` from 6 to 8. The H1
 is deliberately pulled left by 0.045em (the `.heading-flush` optical kern), so
 the spread the test measures against the label/CTA edges scales with type size —
 it is intended offset, not drift. The larger ceiling puts the widest configured
 viewport at ~5.7px, which sat on the old limit.
+
+## Fonts
+
+Anton and Barlow are self-hosted Latin subsets, preloaded, at
+`font-display: swap`. They were originally `block`, which is deterministic for
+screenshots but hides text for up to three seconds on a slow connection — and on
+this site that is the entire page.
+
+Swapping instead of blocking normally trades invisible text for a reflow. Each
+face is therefore paired with a metric-matched fallback in `app/fonts.css`:
+`size-adjust`, `ascent-override` and `descent-override` are set so the fallback
+occupies the same line box and average advance as the real face, computed by
+`scripts/build-font-fallbacks.py`. Re-run it if a font is swapped or resubsetted.
+The fallbacks are `local()`-only, so they cost no download and simply do not
+apply where those system faces are absent.
+
+Measured with the webfonts stalled three seconds, so the fallback paints first:
+
+| Viewport | With metric matching | Without |
+| --- | --- | --- |
+| 390px | no text reflow | About paragraph 6 → 5 lines (156 → 130px) |
+| 768px | no text reflow | Capabilities paragraph 5 → 4 lines (130 → 104px) |
+
+CLS across the load is 0.0002. The headline's own line width does change on
+swap, but its lines are `whitespace-nowrap` blocks, so nothing below them moves.
+
+Screenshot runs stay deterministic because the harness waits on
+`document.fonts.ready` and the `data-fonts-ready` flag before capturing.
 
 ## Carried-over lint warnings
 
