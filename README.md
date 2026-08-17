@@ -187,6 +187,15 @@ Two things followed from that:
   that was tolerable; at full height it is most of the stage. The right now
   clears to ~34%, and the bottom fade is confined to the last 28%.
 
+Lightening the scrim then broke AA, which only CI caught: the horizontal wash
+used percentage stops while the copy column is width-capped, so around 812px the
+standfirst ran past the dense zone onto a lit window and measured **4.16:1**
+against the 4.5 required for 11.5px text. The wash now uses pixel stops, which
+keep the dense zone over the copy at every width — 84.5% darkened there at
+812px, against 46% before — while still clearing for the photograph on wide
+screens. Worth noting this did not reproduce locally on macOS; `section-contrast`
+passed here and failed on Linux.
+
 Vertical balance after the change is 213px above the headline / 201px below the
 CTAs at 1440x900, and 193/213 at 390x844.
 
@@ -210,30 +219,32 @@ viewport at ~5.7px, which sat on the old limit.
 ## Fonts
 
 Anton and Barlow are self-hosted Latin subsets, preloaded, at
-`font-display: swap`. They were originally `block`, which is deterministic for
-screenshots but hides text for up to three seconds on a slow connection — and on
-this site that is the entire page.
+`font-display: block` — the original build's choice, kept.
 
-Swapping instead of blocking normally trades invisible text for a reflow. Each
-face is therefore paired with a metric-matched fallback in `app/fonts.css`:
-`size-adjust`, `ascent-override` and `descent-override` are set so the fallback
-occupies the same line box and average advance as the real face, computed by
-`scripts/build-font-fallbacks.py`. Re-run it if a font is swapped or resubsetted.
-The fallbacks are `local()`-only, so they cost no download and simply do not
-apply where those system faces are absent.
+`swap` was tried and backed out. Not because it was measured to break anything:
+the first CI run failed four screenshot suites, but that was also the first CI
+run this repo has ever had, so there is no green baseline to attribute those
+failures to any single change, and the local parity numbers came back
+byte-identical before and after the revert. The reason is sequencing — `swap`
+lets text paint in a fallback, which is one more variable between a capture and
+the frame it was meant to catch, and introducing that while the regression suite
+is still being stabilised is the wrong order. Worth revisiting as an isolated
+change once CI is green; the faces are preloaded and subsetted, so the window
+`block` withholds text for is short.
 
-Measured with the webfonts stalled three seconds, so the fallback paints first:
+The metric-matched fallbacks in `app/fonts.css` are kept regardless. If the 3s
+block period does elapse on a bad connection, the fallback that takes over holds
+the same line box and average advance, so the page does not reflow when the real
+face lands. Measured with the webfonts stalled three seconds:
 
 | Viewport | With metric matching | Without |
 | --- | --- | --- |
 | 390px | no text reflow | About paragraph 6 → 5 lines (156 → 130px) |
 | 768px | no text reflow | Capabilities paragraph 5 → 4 lines (130 → 104px) |
 
-CLS across the load is 0.0002. The headline's own line width does change on
-swap, but its lines are `whitespace-nowrap` blocks, so nothing below them moves.
-
-Screenshot runs stay deterministic because the harness waits on
-`document.fonts.ready` and the `data-fonts-ready` flag before capturing.
+`scripts/build-font-fallbacks.py` computes the overrides from the font tables —
+re-run it if a face is swapped or resubsetted. They are `local()`-only, so they
+cost no download and do not apply where those system faces are absent.
 
 ## Carried-over lint warnings
 

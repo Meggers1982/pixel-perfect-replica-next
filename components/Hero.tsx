@@ -31,7 +31,24 @@ export function Hero() {
             is confined to the last 28%, where it resolves into solid ink so the
             hero meets the ink section below without a seam. */}
         <div className="absolute inset-0 bg-ink/50 md:bg-ink/25" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/92 via-ink/72 to-ink/12" />
+        {/* Pixel stops, not percentages. The copy column is width-capped
+            (max-w-2xl), but a percentage-based wash clears at a fixed fraction
+            of the viewport — so around 812px the standfirst ran past the dense
+            zone onto a lit window and measured 4.16:1, under AA for 11.5px
+            text. Anchoring the stops in px keeps the dense zone over the copy
+            at every width while still clearing for the photograph on wide
+            screens. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: [
+              "linear-gradient(to right,",
+              "color-mix(in oklab, var(--ink) 92%, transparent) 0px,",
+              "color-mix(in oklab, var(--ink) 78%, transparent) 780px,",
+              "color-mix(in oklab, var(--ink) 12%, transparent) 1500px)",
+            ].join(" "),
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-ink from-0% via-transparent via-28% to-transparent" />
 
         <div className="relative z-10 flex w-full items-center px-5 pb-12 pt-24 sm:px-8 sm:pt-28 lg:pt-32">

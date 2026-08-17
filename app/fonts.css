@@ -1,22 +1,33 @@
 /* Self-hosted latin subsets: pinned bytes, no CDN variance.
  *
- * `swap`, not `block`: block hides text for up to 3s on a slow connection,
- * which is the whole page here. The cost of swapping is a reflow, so each face
- * is paired with a metric-matched fallback below — the browser paints in the
- * fallback, and because its line box and average advance are overridden to
- * match, the switch to the real face barely moves anything.
+ * `block`, as the original build chose. `swap` was tried here and backed out.
  *
- * The overrides are computed by scripts/build-font-fallbacks.py. Re-run it if a
- * font is swapped or resubsetted. `local()` sources mean the fallback simply
- * does not apply where those faces are absent (CI Linux, say) rather than
- * costing a download.
+ * Not because it was measured to break anything — it was not. The first CI run
+ * on this repo failed four screenshot suites, but that run was also the first
+ * ever, so there is no green baseline to attribute those failures to any one
+ * change, and the local parity numbers were byte-identical before and after
+ * the revert. The honest reason is sequencing: `swap` lets text paint in a
+ * fallback, which is one more thing that can vary between a capture and the
+ * frame it was meant to catch, and adding that while the regression suite is
+ * still being stabilised is the wrong order. Revisit it as an isolated change
+ * once CI is green.
+ *
+ * The user-facing cost of `block` is small here: the faces are self-hosted,
+ * subsetted and preloaded, so the window where text is withheld is short.
+ *
+ * The metric-matched fallbacks at the bottom still earn their place. If the 3s
+ * block period does elapse on a bad connection, the fallback that takes over
+ * holds the same line box and advance, so the page does not reflow when the
+ * real face finally lands. Measured with the fonts stalled: without them the
+ * About paragraph jumps 6 lines to 5 at 390px. They are computed by
+ * scripts/build-font-fallbacks.py and are local()-only, so they cost no
+ * download.
  */
-
 @font-face {
   font-family: "Anton";
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
   src: url("/fonts/anton-400.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -25,7 +36,7 @@
   font-family: "Barlow";
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
   src: url("/fonts/barlow-400.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -34,7 +45,7 @@
   font-family: "Barlow";
   font-style: normal;
   font-weight: 500;
-  font-display: swap;
+  font-display: block;
   src: url("/fonts/barlow-500.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -43,7 +54,7 @@
   font-family: "Barlow";
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: block;
   src: url("/fonts/barlow-600.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -52,7 +63,7 @@
   font-family: "Barlow";
   font-style: normal;
   font-weight: 700;
-  font-display: swap;
+  font-display: block;
   src: url("/fonts/barlow-700.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
