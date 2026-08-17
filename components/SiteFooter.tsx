@@ -5,10 +5,19 @@ import { toast } from "sonner";
 
 import { projects } from "@/lib/projects";
 
+/** A bare string is a plain fact (no destination); an object is a real link. */
 type FooterItem = string | { label: string; href: string };
 
 const columns: { title: string; items: FooterItem[] }[] = [
-  { title: "Services", items: ["Brand Identity", "Digital Product", "Positioning", "Packaging"] },
+  {
+    title: "Services",
+    // These used to point at "#top", which sent visitors back to the masthead
+    // and gave crawlers four internal links to nowhere.
+    items: ["Brand Identity", "Digital Product", "Positioning", "Packaging"].map((label) => ({
+      label,
+      href: "#services",
+    })),
+  },
   {
     title: "Work",
     items: projects.map((project) => ({
@@ -33,6 +42,9 @@ export function SiteFooter() {
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
+    // Clear the fields so a second inquiry starts from a blank form rather than
+    // silently re-submitting the first one.
+    event.currentTarget.reset();
     toast.success("Thanks — we'll reply within two business days.");
   };
 
@@ -56,6 +68,7 @@ export function SiteFooter() {
                 <input
                   required
                   name="name"
+                  autoComplete="name"
                   data-lpignore="true"
                   className="mt-2 w-full border-b border-accent-foreground/70 bg-transparent py-3 text-base outline-none placeholder:text-accent-foreground/75 focus:border-accent-foreground"
                   placeholder="Jane Doe"
@@ -67,6 +80,7 @@ export function SiteFooter() {
                   required
                   type="email"
                   name="email"
+                  autoComplete="email"
                   data-lpignore="true"
                   className="mt-2 w-full border-b border-accent-foreground/70 bg-transparent py-3 text-base outline-none placeholder:text-accent-foreground/75 focus:border-accent-foreground"
                   placeholder="jane@company.com"
@@ -84,12 +98,22 @@ export function SiteFooter() {
                 placeholder="Scope, timing, and budget range"
               />
             </label>
-            <button
-              type="submit"
-              className="label-caps bg-accent-foreground px-8 py-4 text-accent transition-opacity hover:opacity-85"
-            >
-              {submitted ? "Inquiry Sent" : "Send Inquiry"}
-            </button>
+            {/* Wrapped so the status region is not itself a `space-y-5` child:
+                as a direct child it collected the 20px gap and stretched the
+                form, even though sr-only takes it out of flow. */}
+            <div>
+              <button
+                type="submit"
+                className="label-caps bg-accent-foreground px-8 py-4 text-accent transition-opacity hover:opacity-85"
+              >
+                {submitted ? "Inquiry Sent" : "Send Inquiry"}
+              </button>
+              {/* The toast is the visible confirmation, but it is not reliably
+                  announced everywhere — this is the guaranteed one. */}
+              <p role="status" aria-live="polite" className="sr-only">
+                {submitted ? "Inquiry sent. We'll reply within two business days." : ""}
+              </p>
+            </div>
           </form>
         </div>
 
@@ -100,15 +124,20 @@ export function SiteFooter() {
               <ul className="mt-2 text-sm">
                 {column.items.map((item) => {
                   const label = typeof item === "string" ? item : item.label;
-                  const href = typeof item === "string" ? "#top" : item.href;
                   return (
                     <li key={label}>
-                      <a
-                        href={href}
-                        className="flex min-h-11 items-center py-2 transition-opacity hover:opacity-70"
-                      >
-                        {label}
-                      </a>
+                      {typeof item === "string" ? (
+                        // "Omaha, NE" is an address, not a destination — as a
+                        // link it was an unlabelled dead end for screen readers.
+                        <span className="flex min-h-11 items-center py-2">{label}</span>
+                      ) : (
+                        <a
+                          href={item.href}
+                          className="flex min-h-11 items-center py-2 transition-opacity hover:opacity-70"
+                        >
+                          {label}
+                        </a>
+                      )}
                     </li>
                   );
                 })}

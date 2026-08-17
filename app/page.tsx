@@ -7,19 +7,18 @@ import { ServicePillars } from "@/components/ServicePillars";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNav } from "@/components/SiteNav";
 import { Toaster } from "@/components/ui/sonner";
-import { routeMetadata, routeSeoTags } from "@/lib/seo";
+import { routeMetadata } from "@/lib/seo";
+import { buildStructuredData } from "@/lib/structured-data";
 
 const title = "Brand Ledger — Brand & Digital for Founder-Led Companies";
 const description =
   "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.";
-const path = "/";
 
 export const metadata = routeMetadata({
   title,
   description,
-  path,
+  path: "/",
   type: "website",
-  siteName: "Brand Ledger",
 });
 
 // `?work=<slug>` deep links must render their lightbox in the server HTML, the
@@ -28,13 +27,14 @@ export const metadata = routeMetadata({
 // would keep the section out of the SSR payload.
 export const dynamic = "force-dynamic";
 
-const { ogUrl, canonical } = routeSeoTags({ path });
-
 export default function Index() {
   return (
     <div className="bg-cream text-ink">
-      <meta property="og:url" content={ogUrl} />
-      <link rel="canonical" href={canonical} />
+      <script
+        type="application/ld+json"
+        // Server-rendered from a typed builder; no user input reaches it.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildStructuredData()) }}
+      />
       <SiteNav />
       <main>
         <Hero />

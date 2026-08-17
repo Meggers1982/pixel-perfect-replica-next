@@ -6,9 +6,9 @@
  * as modules, so the same `src` string works in server and client components and
  * lands in the markup unrewritten.
  *
- * NOTE: heartland-plein-air-arts-festival-website-project.webp was served from
- * Lovable's asset CDN in the TanStack build and is not in version control.
- * Export it from Lovable into /public/images to restore that card's thumbnail.
+ * The Heartland thumbnail used to come from Lovable's asset CDN and was never in
+ * version control, so it 404'd after the migration. It is now a committed
+ * capture of the live project at 1200x800, matching WorkImage's declared size.
  */
 
 export interface Project {

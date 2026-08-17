@@ -1,56 +1,68 @@
 /**
  * Route metadata helper.
  *
- * `routeMetadata()` feeds a route's `export const metadata`. The pieces Next
- * would rewrite are emitted by hand instead — see `routeSeoTags()`: Next
- * resolves `openGraph.url` and `alternates.canonical` against `metadataBase`,
- * so a relative "/" would render as an absolute origin-prefixed URL. The shared
- * expectations in tests/head-metadata.expected.json want the literal "/", so
- * those two tags stay hand-written.
+ * Feeds a route's `export const metadata`. `metadataBase` is set in the root
+ * layout, so the relative `path` given here is resolved to an absolute URL for
+ * `canonical`, `og:url` and image tags — which is what crawlers and social
+ * scrapers require. Anything relative gets treated as a same-origin path by
+ * some scrapers and dropped entirely by others.
  *
  *   export const metadata = routeMetadata({ title, description, path: "/" });
  */
 
 import type { Metadata } from "next";
 
+import { siteName } from "@/lib/site";
+
 export type RouteMetadata = {
   title: string;
   description: string;
-  /** Route path, e.g. "/" or "/about". Used for canonical + og:url. */
+  /** Route path, e.g. "/" or "/about". Resolved against metadataBase. */
   path: string;
-  /** Absolute https URL of a meaningful hero/cover image. Leaf routes only. */
+  /** Cover image path/URL. Defaults to the site-wide Open Graph card. */
   image?: string;
+  /** Alt text for the cover image — screen readers on X/LinkedIn read this. */
+  imageAlt?: string;
   type?: "website" | "article";
-  robots?: string;
-  siteName?: string;
+  robots?: Metadata["robots"];
 };
 
+export const defaultOgImage = "/og.jpg";
+export const defaultOgImageAlt =
+  "Brand Ledger — we build brands that behave like businesses. Brand and digital studio, Omaha, Nebraska.";
+
 export function routeMetadata(meta: RouteMetadata): Metadata {
-  const { title, description, image, type = "website", robots, siteName } = meta;
+  const {
+    title,
+    description,
+    path,
+    image = defaultOgImage,
+    imageAlt = defaultOgImageAlt,
+    type = "website",
+    robots,
+  } = meta;
+
+  const images = [{ url: image, width: 1200, height: 630, alt: imageAlt }];
 
   return {
     title,
     description,
-    authors: [{ name: "Lovable" }],
+    alternates: { canonical: path },
     openGraph: {
       title,
       description,
       type,
-      ...(siteName ? { siteName } : {}),
-      ...(image ? { images: [image] } : {}),
+      url: path,
+      siteName,
+      locale: "en_US",
+      images,
     },
     twitter: {
-      card: image ? "summary_large_image" : "summary",
-      site: "@Lovable",
+      card: "summary_large_image",
       title,
       description,
-      ...(image ? { images: [image] } : {}),
+      images,
     },
     ...(robots ? { robots } : {}),
   };
-}
-
-/** The tags Next would otherwise absolutise. Render inside the route's JSX. */
-export function routeSeoTags(meta: Pick<RouteMetadata, "path">) {
-  return { ogUrl: meta.path, canonical: meta.path };
 }

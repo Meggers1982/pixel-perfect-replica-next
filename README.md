@@ -25,19 +25,15 @@ npm run dev        # http://localhost:3000
 | `npm run test:data` | Projects data-integrity test (`node --test`) |
 
 Playwright suites live in `tests/` — see `tests/README.md`.
+`scripts/build-og-image.py` regenerates the social card.
 
-## Missing asset
+## Configuration
 
-`public/images/heartland-plein-air-arts-festival-website-project.webp` is **not
-in this repo**. In the TanStack build it was served from Lovable's asset CDN via
-`src/assets/*.asset.json`, so the bytes were never version-controlled.
-
-Until it is exported from Lovable and dropped into `public/images/` under that
-exact filename, the first Featured Work card renders `WorkImage`'s "couldn't be
-loaded / Retry" fallback and the page logs two 404s. That accounts for every
-failure in `footer-work-invalid-slug.py` (console-error assertions) and the
-`image alt is ''` failures in `footer-work-history.py`; with a stand-in file in
-place, both suites pass completely. Nothing else references it.
+`NEXT_PUBLIC_SITE_URL` sets the origin used for `canonical`, `og:url`, the
+sitemap and JSON-LD. It defaults to `https://thebrandledger.com` (inferred from
+the studio's contact address in the footer) — **confirm that is the production
+domain**, and set the variable on preview/staging deploys so they do not
+advertise the production URL. Everything else lives in `lib/site.ts`.
 
 ## How the conversion maps
 
@@ -86,6 +82,57 @@ that closes and immediately reopens it reuses the same node — the focus scope
 never remounts and Radix's own open-autofocus never fires again, stranding focus
 on `<body>`. The original had the same latent race; the History API updates fast
 enough to expose it. `footer-work-history.py` covers all 28 history stops.
+
+## Audit fixes
+
+A full SEO / accessibility / content audit followed the conversion. Every fix
+below is pixel-neutral — the 60-comparison parity run was re-run afterwards and
+still reports 0.000000.
+
+**SEO**
+
+- `metadataBase` set, so `canonical` and `og:url` are absolute. Relative values
+  are dropped or mis-resolved by several social scrapers.
+- Added `public/og.jpg`, a 1200x630 card built from the real hero photograph and
+  Anton letterforms by `scripts/build-og-image.py`. There was no `og:image` at
+  all before, so every shared link rendered as a bare text card.
+- Added JSON-LD (`lib/structured-data.ts`): `ProfessionalService` with address,
+  phone, email, founders and a service catalogue; `WebSite`; and an `ItemList`
+  of the four featured projects. A one-page site otherwise gives crawlers
+  nothing to resolve the entity against.
+- Added `app/sitemap.ts` and `app/robots.ts` (the static `public/robots.txt` had
+  no `Sitemap:` directive and would have shadowed the route).
+- Replaced the `Lovable App` / `Lovable Generated Project` / `author: Lovable` /
+  `twitter:site: @Lovable` placeholders with real values. Those were the 404
+  page's title and description.
+- Four footer "Services" links pointed at `#top` — four internal links to
+  nowhere. They now point at `#services`.
+- `fetchPriority="high"` on the hero image, the LCP element on every visit.
+- Preloaded `barlow-700`: the About section sets several names in `<strong>`,
+  and with `font-display: block` those words stayed invisible after the rest of
+  the paragraph had painted.
+
+**Accessibility**
+
+- Added a skip link as the first tab stop. Keyboard and switch users previously
+  had to tab the entire fixed masthead on every visit (WCAG 2.4.1).
+- Added `autocomplete="name"` / `autocomplete="email"` to the contact form
+  (WCAG 1.3.5, AA).
+- The three "Learn More" pillar links were indistinguishable in a screen
+  reader's link list; each now carries its pillar name as an accessible name.
+- "Omaha, NE" was a link to `#top` — an address is not a destination. It is now
+  text.
+- Added an `aria-live` status region for the form confirmation; the toast alone
+  is not reliably announced.
+- The form now clears after submit instead of silently re-submitting.
+
+**Content / assets**
+
+- Restored the Heartland Plein Air Festival thumbnail. It had been served from
+  Lovable's asset CDN and was never in version control, so it 404'd after the
+  migration and the card rendered its error fallback. It is now a committed
+  1200x800 capture of the live project.
+- Deleted `hero-secondary.jpg`, unreferenced since the hero was rebalanced.
 
 ## Carried-over lint warnings
 

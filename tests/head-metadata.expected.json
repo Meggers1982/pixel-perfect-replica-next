@@ -1,5 +1,5 @@
 {
-  "$comment": "Expected head metadata per route. Shared by the TanStack Start app and the Next.js harness so SEO output stays identical across both.",
+  "$comment": "Expected head metadata per route. URLs are absolute because Next resolves them against metadataBase (lib/site.ts, overridable with NEXT_PUBLIC_SITE_URL) — relative og:url and canonical are dropped or mis-resolved by several social scrapers. Run the suite with NEXT_PUBLIC_SITE_URL unset so the production origin below applies.",
   "routes": [
     {
       "path": "/",
@@ -9,13 +9,18 @@
         "property:og:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
         "property:og:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
         "property:og:type": "website",
-        "property:og:url": "/",
+        "property:og:url": "https://thebrandledger.com",
         "property:og:site_name": "Brand Ledger",
-        "name:twitter:card": "summary",
+        "property:og:locale": "en_US",
+        "property:og:image": "https://thebrandledger.com/og.jpg",
+        "property:og:image:width": "1200",
+        "property:og:image:height": "630",
+        "name:twitter:card": "summary_large_image",
         "name:twitter:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
-        "name:twitter:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies."
+        "name:twitter:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
+        "name:twitter:image": "https://thebrandledger.com/og.jpg"
       },
-      "canonical": "/"
+      "canonical": "https://thebrandledger.com"
     }
   ]
 }

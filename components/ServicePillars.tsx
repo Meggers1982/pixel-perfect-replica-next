@@ -58,8 +58,11 @@ export function ServicePillars() {
               </h2>
 
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-cream/90">{pillar.copy}</p>
+              {/* Three links reading only "Learn More" are indistinguishable in
+                  a screen reader's link list — name each by its pillar. */}
               <a
                 href={pillar.target}
+                aria-label={`Learn more about ${pillar.name}`}
                 className="label-caps mt-8 inline-flex w-fit items-center border border-cream px-7 py-4 text-cream transition-colors hover:bg-cream hover:text-ink"
               >
                 Learn More

@@ -12,6 +12,8 @@ export function Hero() {
           alt="Brand Ledger designers reviewing printed brand work in the studio"
           width={1600}
           height={1100}
+          // The LCP element on every visit: fetch it ahead of the lazy pillars.
+          fetchPriority="high"
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* Scrim: directional wash that stays dense behind the copy on the left
