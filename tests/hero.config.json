@@ -23,7 +23,8 @@
     "THAT BEHAVE",
     "LIKE BUSINESSES"
   ],
-  "paddingTolerance": 6,
+  "$paddingToleranceNote": "The H1 is deliberately pulled left by 0.045em (the .heading-flush optical kern), so the measured spread against the label/CTA edges scales with type size — it is intended offset, not drift. The hero clamp now tops out at 9rem instead of 6.25rem, putting the largest configured viewport at ~5.7px, so this allows headroom above that rather than sitting on the limit.",
+  "paddingTolerance": 8,
   "pixelThreshold": 12,
   "maxDiffRatio": 0.005,
   "retries": 2,

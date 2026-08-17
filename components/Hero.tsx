@@ -5,8 +5,11 @@ const heroImage = "/images/hero.jpg";
 export function Hero() {
   return (
     <section id="top" className="relative">
-      {/* Hero stage: full-bleed image with headline, description and CTAs overlaid. */}
-      <div className="relative flex min-h-[78vh] w-full overflow-hidden md:h-[68vh] md:min-h-[480px] lg:h-[74vh] lg:min-h-[560px]">
+      {/* Hero stage: full-bleed image with headline, description and CTAs overlaid.
+          `min-h` rather than a fixed height, so a short landscape phone lets the
+          stage grow instead of clipping the CTAs; `svh` rather than `vh`, so
+          mobile browser chrome cannot make the first view overflow and jump. */}
+      <div className="relative flex min-h-[100svh] w-full overflow-hidden">
         <img
           src={heroImage}
           alt="Brand Ledger designers reviewing printed brand work in the studio"
@@ -17,18 +20,28 @@ export function Hero() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* Scrim: directional wash that stays dense behind the copy on the left
-            and clears toward the right so the photograph reads. */}
-        <div className="absolute inset-0 bg-ink/60 md:bg-ink/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink/92 via-ink/75 to-ink/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/45" />
+            and clears toward the right so the photograph reads. The three layers
+            multiply, so the far right used to land ~51% darkened and the whole
+            lower third was crushed to flat black — at full height that dead band
+            is most of the stage. The right now clears to ~34% and the bottom fade
+            is confined to the last 28%, where it resolves into solid ink so the
+            hero meets the ink section below without a seam. */}
+        <div className="absolute inset-0 bg-ink/50 md:bg-ink/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/92 via-ink/72 to-ink/12" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink from-0% via-transparent via-28% to-transparent" />
 
         <div className="relative z-10 flex w-full items-center px-5 pb-12 pt-24 sm:px-8 sm:pt-28 lg:pt-32">
           <div className="mx-auto w-full max-w-[1600px]">
-            <div className="max-w-[54rem]">
+            {/* Wide enough to hold the longest line at the new upper bound
+                (6.4 x font-size), so the nowrap spans never spill the block. */}
+            <div className="max-w-[68rem]">
             <h1
               className="display text-cream [&>span]:block [&>span]:whitespace-nowrap"
               style={{
-                fontSize: "clamp(2.6rem, 6.6vw, 6.25rem)",
+                // The old 6.25rem ceiling was reached at ~1515px, so on anything
+                // wider the masthead stopped growing and shrank into the corner
+                // of an ever-larger dark field. 6.6vw now runs to ~2180px.
+                fontSize: "clamp(2.6rem, 6.6vw, 9rem)",
                 marginLeft: "-0.045em",
                 paddingTop: "0.02em",
                 paddingBottom: "0.04em",

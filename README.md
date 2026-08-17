@@ -3,10 +3,13 @@
 The Brand Ledger one-page site, converted from the Lovable/TanStack Start (Vite)
 build to Next.js 16 (App Router, React 19, Tailwind v4).
 
-The render is pixel-identical to the original: every section was screenshotted
-at all ten viewports in `tests/hero.config.json` against both apps running side
-by side, and all 60 comparisons came back at a **0.000000 diff ratio with no
-size mismatches**.
+The conversion was verified by screenshotting every section at all ten viewports
+in `tests/hero.config.json` against both apps running side by side: **0.000000
+diff ratio, no size mismatches**, across all 60 comparisons.
+
+Two sections have since moved on from that baseline on purpose — Featured Work,
+whose Heartland thumbnail was restored, and the hero, which was rebuilt (see
+below). Everything else still matches the original byte for byte.
 
 ## Development
 
@@ -95,11 +98,11 @@ TanStack `navigate({ search: { work } })` calls — while back/forward keep work
 is resolved on the server and the hook needs no Suspense boundary that would
 otherwise keep Featured Work out of the SSR payload.
 
-**`og:url` and `canonical` are hand-rendered.** Next resolves relative URLs in
-`openGraph.url` and `alternates.canonical` against `metadataBase`, which would
-turn `"/"` into an absolute origin-prefixed URL. `tests/head-metadata.expected.json`
-is shared with the original app and wants the literal `"/"`, so `lib/seo.ts`
-emits those two tags directly. `head-metadata.py` passes all 11 assertions.
+**SEO output is built from `metadataBase`.** The conversion initially
+hand-rendered `og:url` and `canonical` to reproduce the original's literal `"/"`.
+The audit reversed that: relative values are dropped or mis-resolved by several
+social scrapers, so both are now absolute and `tests/head-metadata.expected.json`
+was updated to match. `head-metadata.py` passes all 16 assertions.
 
 ### One behavioural fix
 
@@ -160,6 +163,38 @@ still reports 0.000000.
   migration and the card rendered its error fallback. It is now a committed
   1200x800 capture of the live project.
 - Deleted `hero-secondary.jpg`, unreferenced since the hero was rebalanced.
+
+## Hero
+
+The hero is the one place that deliberately diverges from the original render.
+
+It used to be capped at `74vh` (`68vh` at `md`), so 230–280px of the next
+section always bled into the first view — the fold landed in the middle of
+nothing. It is now `min-h-[100svh]`: `min-h` rather than a fixed height so a
+short landscape phone lets the stage grow instead of clipping the CTAs, and
+`svh` rather than `vh` so mobile browser chrome cannot make the first view
+overflow.
+
+Two things followed from that:
+
+- **The display clamp topped out at `6.25rem`, reached at ~1515px.** On anything
+  wider the masthead stopped growing while the stage kept expanding, so it shrank
+  into the corner of an ever-larger dark field. The ceiling is now `9rem`, which
+  keeps `6.6vw` governing out to ~2180px. The block above it widens to `68rem`
+  to hold the longest line (6.4 × font-size) without the nowrap spans spilling.
+- **The scrim was crushing the photograph.** Three layers multiply, so the far
+  right landed ~51% darkened and the whole lower half was flat black. At 74vh
+  that was tolerable; at full height it is most of the stage. The right now
+  clears to ~34%, and the bottom fade is confined to the last 28%.
+
+Vertical balance after the change is 213px above the headline / 201px below the
+CTAs at 1440x900, and 193/213 at 390x844.
+
+Note that `tests/hero.config.json` raises `paddingTolerance` from 6 to 8. The H1
+is deliberately pulled left by 0.045em (the `.heading-flush` optical kern), so
+the spread the test measures against the label/CTA edges scales with type size —
+it is intended offset, not drift. The larger ceiling puts the widest configured
+viewport at ~5.7px, which sat on the old limit.
 
 ## Carried-over lint warnings
 
