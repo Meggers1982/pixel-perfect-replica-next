@@ -33,7 +33,34 @@ Playwright suites live in `tests/` — see `tests/README.md`.
 sitemap and JSON-LD. It defaults to `https://thebrandledger.com` (inferred from
 the studio's contact address in the footer) — **confirm that is the production
 domain**, and set the variable on preview/staging deploys so they do not
-advertise the production URL. Everything else lives in `lib/site.ts`.
+advertise the production URL.
+
+`NEXT_PUBLIC_FORMSPREE_ENDPOINT` sets where the contact form posts. It defaults
+to the studio's Formspree form. Point preview deploys at a throwaway form so
+test traffic stays out of the real inbox. Everything else lives in `lib/site.ts`.
+
+## Contact form
+
+The footer form posts to Formspree. It carries a real `action`/`method`, so
+with JavaScript disabled the browser posts natively and lands on Formspree's
+thank-you page; with JavaScript, `onSubmit` intercepts and sends the same
+`FormData` over `fetch` (with `Accept: application/json`, without which
+Formspree answers with a redirect rather than JSON) so the visitor stays put.
+
+Two hidden fields ride along: `_subject` names the notification email, and
+`_gotcha` is a honeypot Formspree uses to discard bot submissions.
+
+The three outcomes are handled distinctly, because the failure modes matter
+more than the happy path:
+
+| Outcome | Behaviour |
+| --- | --- |
+| Success | Form clears, button reads "Inquiry Sent", toast + `role="status"` announcement |
+| Formspree rejects | Its message is shown in a `role="alert"`, **inputs are preserved**, button resets so the visitor can retry |
+| Network failure | Same, with a fallback message pointing at the direct email address |
+
+Nothing the visitor typed is ever discarded on a failure — only a confirmed
+success resets the form.
 
 ## How the conversion maps
 

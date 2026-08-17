@@ -9,5 +9,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     /** Origin the site is served from, e.g. https://thebrandledger.com. */
     NEXT_PUBLIC_SITE_URL?: string;
+    /** Formspree form URL the contact form posts to. */
+    NEXT_PUBLIC_FORMSPREE_ENDPOINT?: string;
   }
 }

@@ -28,6 +28,14 @@ export const contact = {
   country: "US",
 } as const;
 
+/**
+ * Formspree endpoint the contact form posts to. Public by design — it is a
+ * write-only submission URL, not a credential — so it ships in the client
+ * bundle. Override per environment to keep test traffic out of the real inbox.
+ */
+export const formEndpoint =
+  process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ?? "https://formspree.io/f/xdenwnlp";
+
 export const founded = "2014";
 
 export const founders = ["Dana Whitcomb", "Elias Roche"] as const;

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { projects } from "@/lib/projects";
+import { formEndpoint, siteName } from "@/lib/site";
 
 /** A bare string is a plain fact (no destination); an object is a real link. */
 type FooterItem = string | { label: string; href: string };
@@ -36,17 +37,72 @@ const columns: { title: string; items: FooterItem[] }[] = [
   },
 ];
 
-export function SiteFooter() {
-  const [submitted, setSubmitted] = useState(false);
+type Status = "idle" | "submitting" | "success" | "error";
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+const SUCCESS_MESSAGE = "Thanks — we'll reply within two business days.";
+const GENERIC_ERROR =
+  "That didn't send. Try again, or email hello@thebrandledger.com directly.";
+
+/** Formspree replies with `{ errors: [{ message, field }] }` on a rejection. */
+async function readFormspreeError(response: Response): Promise<string> {
+  try {
+    const payload = (await response.json()) as { errors?: { message?: string }[] };
+    const message = payload.errors
+      ?.map((error) => error.message)
+      .filter(Boolean)
+      .join(" ");
+    return message && message.length > 0 ? message : GENERIC_ERROR;
+  } catch {
+    return GENERIC_ERROR;
+  }
+}
+
+export function SiteFooter() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-    // Clear the fields so a second inquiry starts from a blank form rather than
-    // silently re-submitting the first one.
-    event.currentTarget.reset();
-    toast.success("Thanks — we'll reply within two business days.");
+    // Captured before the first await: React clears currentTarget once the
+    // handler yields.
+    const form = event.currentTarget;
+    const body = new FormData(form);
+
+    setStatus("submitting");
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(formEndpoint, {
+        method: "POST",
+        body,
+        // Without this Formspree answers with a redirect to its own thank-you
+        // page instead of JSON.
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        const message = await readFormspreeError(response);
+        setStatus("error");
+        setErrorMessage(message);
+        toast.error(message);
+        return;
+      }
+
+      // Clear the fields so a second inquiry starts from a blank form rather
+      // than silently re-submitting the first one.
+      form.reset();
+      setStatus("success");
+      toast.success(SUCCESS_MESSAGE);
+    } catch {
+      // Offline, DNS failure, blocked by an extension — the inputs are kept so
+      // nothing the visitor typed is lost.
+      setStatus("error");
+      setErrorMessage(GENERIC_ERROR);
+      toast.error(GENERIC_ERROR);
+    }
   };
+
+  const submitting = status === "submitting";
 
   return (
     <footer id="contact" className="overflow-hidden bg-accent text-accent-foreground">
@@ -61,7 +117,28 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-5">
+          {/* action/method are the no-JS path: the browser posts straight to
+              Formspree and lands on its thank-you page. With JS, onSubmit
+              intercepts and posts the same FormData over fetch so the visitor
+              stays on the page. */}
+          <form
+            onSubmit={onSubmit}
+            action={formEndpoint}
+            method="POST"
+            className="space-y-5"
+          >
+            {/* Names the notification email in the Formspree inbox. */}
+            <input type="hidden" name="_subject" value={`New inquiry — ${siteName}`} />
+            {/* Honeypot: Formspree discards any submission where this is filled,
+                which catches bots that populate every field they find. */}
+            <input
+              type="text"
+              name="_gotcha"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+            />
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block">
                 <span className="label-caps">Name</span>
@@ -104,15 +181,28 @@ export function SiteFooter() {
             <div>
               <button
                 type="submit"
-                className="label-caps bg-accent-foreground px-8 py-4 text-accent transition-opacity hover:opacity-85"
+                disabled={submitting}
+                aria-busy={submitting}
+                className="label-caps bg-accent-foreground px-8 py-4 text-accent transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {submitted ? "Inquiry Sent" : "Send Inquiry"}
+                {status === "submitting"
+                  ? "Sending…"
+                  : status === "success"
+                    ? "Inquiry Sent"
+                    : "Send Inquiry"}
               </button>
               {/* The toast is the visible confirmation, but it is not reliably
                   announced everywhere — this is the guaranteed one. */}
               <p role="status" aria-live="polite" className="sr-only">
-                {submitted ? "Inquiry sent. We'll reply within two business days." : ""}
+                {status === "success" ? "Inquiry sent. We'll reply within two business days." : ""}
               </p>
+              {/* A failed send has to be visible, not just a toast that expires
+                  — the visitor's message is still sitting in the form. */}
+              {status === "error" && errorMessage ? (
+                <p role="alert" className="mt-4 max-w-md text-sm leading-relaxed">
+                  {errorMessage}
+                </p>
+              ) : null}
             </div>
           </form>
         </div>
