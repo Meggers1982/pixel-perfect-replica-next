@@ -35,7 +35,12 @@ EXPECTED_EMAIL = "hello@thebrandledger.com"
 EXPECTED_MAILTO = "mailto:hello@thebrandledger.com"
 EXPECTED_PHONE = "(402) 957-2262"
 EXPECTED_TEL = "tel:+14029572262"
-EXPECTED_LOCATION = "Omaha, Nebraska"
+# Must match `contact` / `addressLines` in lib/site.ts. The footer published
+# only "Omaha, Nebraska" until the studio's street address was added; asserting
+# both lines means the suite now guards the real address rather than just the
+# city, and a half-applied change to lib/site.ts fails here instead of shipping.
+EXPECTED_STREET = "6311 Ames Ave, Unit 198"
+EXPECTED_LOCATION = "Omaha, NE 68104"
 
 # These must match the projects exported from lib/projects.ts.
 EXPECTED_WORK_PROJECTS = [
@@ -96,6 +101,9 @@ async def run_assertions(page) -> list[str]:
 
     if EXPECTED_PHONE not in text:
         failures.append(f"Expected phone {EXPECTED_PHONE!r}, got {text!r}")
+
+    if EXPECTED_STREET not in text:
+        failures.append(f"Expected street {EXPECTED_STREET!r}, got {text!r}")
 
     if EXPECTED_LOCATION not in text:
         failures.append(f"Expected location {EXPECTED_LOCATION!r}, got {text!r}")
