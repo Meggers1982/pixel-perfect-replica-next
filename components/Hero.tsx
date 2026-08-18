@@ -48,19 +48,27 @@ export function Hero() {
               <p className="label-caps text-accent-on-dark">
                 Content · Design · Search — Omaha, Nebraska
               </p>
+              {/* Two size ramps, because the two layouts have different limits.
+              
+                  Below md the spans wrap, so the binding constraint is the
+                  longest *word*: "EXPERIENCED" measures 4.77x the font size, and
+                  at a 320px viewport (280px of measure) that caps it near 58px.
+                  There was headroom over the old flat 2.6rem, but spending it as
+                  a flat floor made small phones worse — the headline is four rows
+                  tall there, so every extra pixel pushes the CTAs further below
+                  the fold, and at 320x568 and 360x640 they already sit under it.
+                  12.2vw instead means the smallest phones keep 2.6rem exactly
+                  while a 393px phone gets ~48px and a 430px one ~52px, capped at
+                  3.3rem so a large phone in landscape does not run away with it.
+              
+                  From md the spans are nowrap and the constraint is the longest
+                  *line* at 8.83x, which is what the 6.6vw ramp and its 9rem
+                  ceiling are sized for. The ceiling is reached at ~2180px; the
+                  old 6.25rem one was hit at ~1515px, above which the masthead
+                  shrank into the corner of an ever-larger dark field. */}
               <h1
-                className="display mt-6 leading-[1.04] text-cream [&>span]:block md:leading-[0.93] md:[&>span]:whitespace-nowrap"
+                className="display mt-6 text-[clamp(2.6rem,12.2vw,3.3rem)] leading-[1.04] text-cream [&>span]:block md:text-[clamp(2.6rem,6.6vw,9rem)] md:leading-[0.93] md:[&>span]:whitespace-nowrap"
                 style={{
-                  // The old 6.25rem ceiling was reached at ~1515px, so on anything
-                  // wider the masthead stopped growing and shrank into the corner
-                  // of an ever-larger dark field. 6.6vw now runs to ~2180px.
-                  //
-                  // Below md the spans are allowed to wrap, so the floor is no
-                  // longer hostage to the longest line — "Experienced by
-                  // people." breaks over two rows on a phone and the type stays
-                  // at the size it was. From md up the spans are nowrap again
-                  // and the headline holds its three-line shape.
-                  fontSize: "clamp(2.6rem, 6.6vw, 9rem)",
                   marginLeft: "-0.045em",
                   paddingTop: "0.02em",
                   paddingBottom: "0.04em",
