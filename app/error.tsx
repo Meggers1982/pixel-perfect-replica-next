@@ -1,17 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-import { reportLovableError } from "@/lib/lovable-error-reporting";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+  // The only reporting left is the console. The effect that used to sit here
+  // forwarded the error to two window globals injected by the visual builder
+  // this site was originally generated in; they existed only inside its editor
+  // preview, so on the deployed site both were always undefined and the call
+  // shipped a module plus a global type augmentation to do nothing. Wire up a
+  // real service here if this site ever needs client error tracking.
   console.error(error);
   const router = useRouter();
-
-  useEffect(() => {
-    reportLovableError(error, { boundary: "next_route_error_boundary" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

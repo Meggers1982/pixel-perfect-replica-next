@@ -26,10 +26,18 @@ export const contact = {
   /** E.164, for tel: links and structured data. */
   phone: "+14029572262",
   phoneDisplay: "(402) 957-2262",
+  street: "6311 Ames Ave, Unit 198",
   locality: "Omaha",
   region: "NE",
+  postalCode: "68104",
   country: "US",
 } as const;
+
+/** The address as it should read to a person, one line per rendered row. */
+export const addressLines = [
+  contact.street,
+  `${contact.locality}, ${contact.region} ${contact.postalCode}`,
+] as const;
 
 /**
  * Formspree endpoint the contact form posts to. Public by design — it is a

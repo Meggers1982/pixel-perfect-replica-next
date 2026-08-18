@@ -34,8 +34,10 @@ export function buildStructuredData() {
     telephone: contact.phone,
     address: {
       "@type": "PostalAddress",
+      streetAddress: contact.street,
       addressLocality: contact.locality,
       addressRegion: contact.region,
+      postalCode: contact.postalCode,
       addressCountry: contact.country,
     },
     areaServed: { "@type": "Country", name: "United States" },

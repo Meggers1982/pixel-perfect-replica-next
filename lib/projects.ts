@@ -7,7 +7,8 @@
  * lands in the markup unrewritten.
  *
  * The Heartland thumbnail is a committed 1200x800 capture of the live project.
- * It used to come from Lovable's asset CDN and was never in version control, so
+ * It used to come from the original builder's asset CDN and was never in
+ * version control, so
  * it 404'd after the migration.
  */
 

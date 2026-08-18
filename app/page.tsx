@@ -1,4 +1,5 @@
 import { About } from "@/components/About";
+import { BackToTop } from "@/components/BackToTop";
 import { Capabilities } from "@/components/Capabilities";
 import { CookieBar } from "@/components/CookieBar";
 import { FeaturedWork } from "@/components/FeaturedWork";
@@ -44,6 +45,7 @@ export default function Index() {
         <About />
       </main>
       <SiteFooter />
+      <BackToTop />
       <CookieBar />
       <Toaster />
     </div>

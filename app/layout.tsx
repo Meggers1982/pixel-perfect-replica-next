@@ -53,7 +53,8 @@ export const metadata: Metadata = {
   // app/apple-icon.png are file conventions, so Next emits the <link> tags
   // itself with content-hashed URLs. Declaring them here as well produced a
   // second, unhashed set of tags pointing at the same files — and the old
-  // entry pointed at public/favicon.ico, which was still Lovable's logo.
+  // entry pointed at public/favicon.ico, which was still the logo of the
+  // visual builder this site was generated in rather than the studio's own.
   formatDetection: { telephone: false },
 };
 

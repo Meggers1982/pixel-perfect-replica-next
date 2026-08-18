@@ -21,14 +21,22 @@ export function CookieBar() {
     if (!visible) return;
     const bar = barRef.current;
     if (!bar) return;
-    const apply = () =>
+    const apply = () => {
       document.body.style.setProperty("padding-bottom", `${bar.offsetHeight}px`);
+      // Published for other fixed UI (BackToTop) so it can sit above the bar
+      // without hard-coding a height that changes when the copy wraps.
+      document.documentElement.style.setProperty(
+        "--cookie-bar-height",
+        `${bar.offsetHeight}px`,
+      );
+    };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(bar);
     return () => {
       observer.disconnect();
       document.body.style.removeProperty("padding-bottom");
+      document.documentElement.style.removeProperty("--cookie-bar-height");
     };
   }, [visible]);
 

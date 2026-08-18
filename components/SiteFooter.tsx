@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { projects } from "@/lib/projects";
-import { formEndpoint, siteName } from "@/lib/site";
+import { addressLines, contact, formEndpoint, siteName } from "@/lib/site";
 
 /** A bare string is a plain fact (no destination); an object is a real link. */
 type FooterItem = string | { label: string; href: string };
@@ -27,15 +27,41 @@ const columns: { title: string; items: FooterItem[] }[] = [
     })),
   },
   { title: "About", items: [{ label: "The Studio", href: "#about" }] },
-  {
-    title: "Contact",
-    items: [
-      { label: "hello@thebrandledger.com", href: "mailto:hello@thebrandledger.com" },
-      { label: "(402) 957-2262", href: "tel:+14029572262" },
-      "Omaha, Nebraska",
-    ],
-  },
 ];
+
+/* Line icons, sized to the cap height of the text they sit beside. Stroked
+   rather than filled so they read at the same weight as the type on the red,
+   and aria-hidden because each one duplicates a label that is already there. */
+const iconProps = {
+  "aria-hidden": true,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  className: "mt-0.5 h-[1.15em] w-[1.15em] shrink-0",
+} as const;
+
+const MailIcon = () => (
+  <svg {...iconProps}>
+    <rect x="2" y="4" width="20" height="16" rx="1" />
+    <path d="m2 6 10 7 10-7" />
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg {...iconProps}>
+    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z" />
+  </svg>
+);
+
+const PinIcon = () => (
+  <svg {...iconProps}>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -235,6 +261,50 @@ export function SiteFooter() {
 
             </div>
           ))}
+
+          {/* Contact is rendered on its own rather than from `columns`: the
+              rows pair an icon with their label, and the address is two lines
+              of plain text rather than a link. Icons are decorative — the
+              mailto/tel links carry their own accessible names. */}
+          <div>
+            <p className="label-caps">Contact</p>
+            <ul className="mt-2 text-sm">
+              <li>
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="flex min-h-11 items-center gap-3 py-2 transition-opacity hover:opacity-70"
+                >
+                  <MailIcon />
+                  <span>{contact.email}</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:${contact.phone}`}
+                  className="flex min-h-11 items-center gap-3 py-2 transition-opacity hover:opacity-70"
+                >
+                  <PhoneIcon />
+                  <span>{contact.phoneDisplay}</span>
+                </a>
+              </li>
+              <li>
+                {/* A postal address is a fact, not a destination — as a link it
+                    was an unlabelled dead end for screen readers. <address> is
+                    the element for it; the italic default is cleared because
+                    nothing else in this footer is italic. */}
+                <address className="flex min-h-11 items-start gap-3 py-2 not-italic leading-relaxed">
+                  <PinIcon />
+                  <span>
+                    {addressLines.map((line) => (
+                      <span key={line} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </span>
+                </address>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-16 w-full overflow-hidden sm:mt-20">
