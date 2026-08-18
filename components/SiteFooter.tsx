@@ -32,7 +32,7 @@ const columns: { title: string; items: FooterItem[] }[] = [
     items: [
       { label: "hello@thebrandledger.com", href: "mailto:hello@thebrandledger.com" },
       { label: "(402) 957-2262", href: "tel:+14029572262" },
-      "Omaha, NE",
+      "Omaha, Nebraska",
     ],
   },
 ];

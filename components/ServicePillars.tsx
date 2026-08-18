@@ -7,7 +7,7 @@ const pillars = [
     name: "Content Strategy & SEO",
     image: brandImage,
     alt: "A content plan and page briefs laid out in print on a studio table",
-    copy: "Content audit, message hierarchy, sitemap and a brief for every page — what it says, who it is for, and what it should make someone do. Search intent shapes the structure from the start, so ranking is not something bolted on after launch.",
+    copy: "Content audit, message hierarchy, sitemap and a brief for every page — what it says, who it is for, and what it should make someone do. Search engine optimization shapes the structure from the start, so ranking is not something bolted on after launch.",
     target: "#capabilities",
   },
   {
@@ -21,7 +21,7 @@ const pillars = [
     name: "AI & GEO",
     image: strategyImage,
     alt: "A strategy workshop wall covered in notes and printed charts",
-    copy: "Search is turning into answers. We structure content so models can parse and cite it — clean semantics, schema, and pages that state a claim plainly instead of burying it in preamble. If an AI cannot quote you, it will quote a competitor.",
+    copy: "Search is turning into answers, so generative engine optimization (GEO) is now its own discipline. We structure content so models can parse and cite it — clean semantics, schema, and pages that state a claim plainly instead of burying it in preamble. If an AI cannot quote you, it will quote a competitor.",
     target: "#about",
   },
 ];

@@ -35,7 +35,7 @@ EXPECTED_EMAIL = "hello@thebrandledger.com"
 EXPECTED_MAILTO = "mailto:hello@thebrandledger.com"
 EXPECTED_PHONE = "(402) 957-2262"
 EXPECTED_TEL = "tel:+14029572262"
-EXPECTED_LOCATION = "Omaha, NE"
+EXPECTED_LOCATION = "Omaha, Nebraska"
 
 # These must match the projects exported from lib/projects.ts.
 EXPECTED_WORK_PROJECTS = [

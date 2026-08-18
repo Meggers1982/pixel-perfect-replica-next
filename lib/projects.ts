@@ -18,6 +18,8 @@ export interface Project {
   image: string;
   alt: string;
   note: string;
+  /** Live site, if the work is still published. */
+  url?: string;
 }
 
 export const projects: Project[] = [
@@ -27,6 +29,7 @@ export const projects: Project[] = [
     name: "Heartland Plein Air Festival",
     image: "/images/heartland-plein-air-arts-festival-website-project.webp",
     alt: "Heartland Plein Air Festival website hero with painterly landscape and event details",
-    note: "Content strategy, site architecture and build for a week-long festival — schedule, artist gallery, ticketing and open-division registration, structured so every event and artist page can rank and be cited on its own.",
+    note: "A week-long festival with twenty-five artists, a public schedule, ticketed events and an open-division competition — each of which had to be findable on its own. We modelled the content so every artist, event and venue is its own page carrying its own schema, and built the wayfinding around the three things visitors actually arrive for: when it is, who is in it, and how to get a ticket.",
+    url: "https://heartlandpleinair.org",
   },
 ];

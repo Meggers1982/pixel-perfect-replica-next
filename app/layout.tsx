@@ -48,7 +48,10 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: [{ rel: "icon", url: "/favicon.ico", type: "image/x-icon" }],
+  icons: {
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   formatDetection: { telephone: false },
 };
 

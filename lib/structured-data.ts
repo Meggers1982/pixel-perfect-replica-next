@@ -7,7 +7,7 @@
  * which services it offers — so the entity can be resolved rather than guessed.
  */
 
-import { absoluteUrl, contact, founded, founders, siteDescription, siteName, siteUrl } from "@/lib/site";
+import { absoluteUrl, contact, founders, siteDescription, siteName, siteUrl } from "@/lib/site";
 import { projects } from "@/lib/projects";
 
 const SERVICES = [
@@ -29,7 +29,6 @@ export function buildStructuredData() {
     url: siteUrl,
     description: siteDescription,
     image: absoluteUrl("/og.jpg"),
-    foundingDate: founded,
     founder: founders.map((name) => ({ "@type": "Person", name })),
     email: contact.email,
     telephone: contact.phone,
@@ -78,7 +77,10 @@ export function buildStructuredData() {
         name: project.name,
         description: project.note,
         genre: project.category,
-        url: `${siteUrl}/?work=${encodeURIComponent(project.slug)}#work`,
+        // The live site is the work itself; the portfolio deep link is where it
+        // is written about, which is what mainEntityOfPage is for.
+        ...(project.url ? { url: project.url } : {}),
+        mainEntityOfPage: `${siteUrl}/?work=${encodeURIComponent(project.slug)}#work`,
         image: absoluteUrl(project.image),
         creator: { "@id": organizationId },
       },

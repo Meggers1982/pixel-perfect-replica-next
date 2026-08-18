@@ -10,17 +10,16 @@ export function About() {
 
         <div className="space-y-6 text-base leading-relaxed text-ink/80">
           <p>
-            Brand Ledger was founded in 2014 by <strong className="text-ink">Dana Whitcomb</strong>{" "}
-            and <strong className="text-ink">Elias Roche</strong>. The studio has stayed
-            deliberately small: the people you meet on the first call are the people who do the
-            work, and nothing gets relayed through someone who wasn&apos;t in the room.
+            Brand Ledger is the studio of <strong className="text-ink">Meagan Morris</strong>. You
+            talk to the person doing the work — there is no manager relaying it, and nothing gets
+            decided by someone who wasn&apos;t in the room.
           </p>
           <p>
-            We take on eight to ten engagements a year. A studio this size can cover that much
-            ground because <strong className="text-ink">AI does the parts that scale</strong> —
+            The studio takes on a small number of engagements at a time, and covers the ground it
+            does because <strong className="text-ink">AI handles the parts that scale</strong> —
             crawling a category, reading ten thousand search queries, drafting the twentieth
-            variation of a page — while the judgement about what any of it means stays with us. The
-            research is machine-assisted. The decisions are not.
+            variation of a page. The research is machine-assisted. The judgement about what any of
+            it means is not.
           </p>
           <p>
             We would rather be judged on what happened afterward — the rankings, the citations, the

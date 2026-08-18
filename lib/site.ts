@@ -15,6 +15,9 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://thebrandled
 
 export const siteName = "Brand Ledger";
 
+/** Bump when the page copy materially changes; feeds sitemap lastmod. */
+export const contentUpdated = "2026-08-18";
+
 export const siteDescription =
   "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.";
 
@@ -36,9 +39,12 @@ export const contact = {
 export const formEndpoint =
   process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT ?? "https://formspree.io/f/xdenwnlp";
 
-export const founded = "2014";
-
-export const founders = ["Dana Whitcomb", "Elias Roche"] as const;
+/**
+ * No founding date is published. The previous value was placeholder fiction,
+ * and foundingDate is a factual claim to crawlers — better absent than wrong.
+ * Add it here and restore `foundingDate` in lib/structured-data.ts once known.
+ */
+export const founders = ["Meagan Morris"] as const;
 
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path: string): string {

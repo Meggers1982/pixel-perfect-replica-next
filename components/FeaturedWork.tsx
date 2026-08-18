@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
 
 import { prefetchImage, prefetchImagesWhenIdle } from "@/lib/image-prefetch";
 import { logPerf, now } from "@/lib/perf-log";
@@ -502,6 +502,18 @@ export function FeaturedWork() {
                     <DialogPrimitive.Description className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">
                       {active.note}
                     </DialogPrimitive.Description>
+                    {active.url ? (
+                      <a
+                        href={active.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="label-caps mt-7 inline-flex items-center gap-2 border border-ink px-6 py-3 text-ink transition-colors hover:bg-ink hover:text-cream"
+                      >
+                        Visit {new URL(active.url).hostname.replace(/^www\./, "")}
+                        <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                        <span className="sr-only">(opens in a new tab)</span>
+                      </a>
+                    ) : null}
                   </div>
                 </div>
                 <p className="sr-only">
