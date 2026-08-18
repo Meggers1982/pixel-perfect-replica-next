@@ -15,11 +15,12 @@ export function About() {
             decided by someone who wasn&apos;t in the room.
           </p>
           <p>
-            The studio takes on a small number of engagements at a time, and covers the ground it
-            does because <strong className="text-ink">AI handles the parts that scale</strong> —
-            crawling a category, reading ten thousand search queries, drafting the twentieth
-            variation of a page. The research is machine-assisted. The judgement about what any of
-            it means is not.
+            The studio takes on a small number of engagements at a time, and still covers the
+            ground it does because the research is{' '}
+            <strong className="text-ink">systematic rather than sampled</strong> — an entire
+            category crawled, ten thousand search queries read, the twentieth variation of a page
+            drafted before one is chosen. The gathering scales. The judgement about what any of it
+            means does not.
           </p>
           <p>
             We would rather be judged on what happened afterward — the rankings, the citations, the
