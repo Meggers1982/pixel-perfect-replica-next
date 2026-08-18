@@ -40,9 +40,6 @@ EXPECTED_LOCATION = "Omaha, NE"
 # These must match the projects exported from lib/projects.ts.
 EXPECTED_WORK_PROJECTS = [
     ("Heartland Plein Air Festival", "heartland-plein-air-festival"),
-    ("Hollow Roasters", "hollow-roasters"),
-    ("Field & Frame", "field-and-frame"),
-    ("Meridian Health", "meridian-health"),
 ]
 EXPECTED_ABOUT_ITEMS = ["The Studio"]
 

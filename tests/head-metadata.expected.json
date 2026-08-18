@@ -3,11 +3,11 @@
   "routes": [
     {
       "path": "/",
-      "title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
+      "title": "Brand Ledger — Content Strategy, Web Design & UX in Omaha",
       "meta": {
-        "name:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
-        "property:og:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
-        "property:og:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
+        "name:description": "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.",
+        "property:og:title": "Brand Ledger — Content Strategy, Web Design & UX in Omaha",
+        "property:og:description": "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.",
         "property:og:type": "website",
         "property:og:url": "https://thebrandledger.com",
         "property:og:site_name": "Brand Ledger",
@@ -16,8 +16,8 @@
         "property:og:image:width": "1200",
         "property:og:image:height": "630",
         "name:twitter:card": "summary_large_image",
-        "name:twitter:title": "Brand Ledger — Brand & Digital for Founder-Led Companies",
-        "name:twitter:description": "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.",
+        "name:twitter:title": "Brand Ledger — Content Strategy, Web Design & UX in Omaha",
+        "name:twitter:description": "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.",
         "name:twitter:image": "https://thebrandledger.com/og.jpg"
       },
       "canonical": "https://thebrandledger.com"

@@ -10,9 +10,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { routeMetadata } from "@/lib/seo";
 import { buildStructuredData } from "@/lib/structured-data";
 
-const title = "Brand Ledger — Brand & Digital for Founder-Led Companies";
+const title = "Brand Ledger — Content Strategy, Web Design & UX in Omaha";
 const description =
-  "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.";
+  "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.";
 
 export const metadata = routeMetadata({
   title,

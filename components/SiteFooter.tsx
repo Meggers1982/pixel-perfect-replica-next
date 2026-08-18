@@ -14,7 +14,7 @@ const columns: { title: string; items: FooterItem[] }[] = [
     title: "Services",
     // These used to point at "#top", which sent visitors back to the masthead
     // and gave crawlers four internal links to nowhere.
-    items: ["Brand Identity", "Digital Product", "Positioning", "Packaging"].map((label) => ({
+    items: ["Content Strategy", "SEO & GEO", "Web Design", "UX Design"].map((label) => ({
       label,
       href: "#services",
     })),

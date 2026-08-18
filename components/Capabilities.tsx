@@ -1,23 +1,23 @@
 const capabilities = [
   {
     step: "01",
-    title: "Diagnose",
-    copy: "Two weeks of interviews, category audit and internal stakeholder sessions. We come back with the problem stated plainly, in one page.",
+    title: "Audit",
+    copy: "Two weeks with your analytics, your search data, your visibility in AI answers and your customers. We come back with what the site is failing to say, stated plainly, in one page.",
   },
   {
     step: "02",
-    title: "Position",
-    copy: "Messaging hierarchy, naming and narrative. Written first, designed second — if the sentence doesn't hold up in plain text, no typeface will save it.",
+    title: "Plan",
+    copy: "Sitemap, message hierarchy and a brief for every page. Written first, designed second — if the sentence doesn't hold up in plain text, no typeface will save it.",
   },
   {
     step: "03",
-    title: "Design",
-    copy: "Identity systems, packaging and interface design produced in tight weekly cycles with the founders in the room, not in a review queue.",
+    title: "Design & Build",
+    copy: "Interface and layout produced in tight weekly cycles, with your real content in it rather than placeholder text, and the founders in the room instead of a review queue.",
   },
   {
     step: "04",
-    title: "Ship & Support",
-    copy: "Production files, build, launch and a six-month support window so the system survives contact with your team.",
+    title: "Launch & Measure",
+    copy: "Launch, then track what it actually earned — rankings, citations in AI answers, and what people do once they arrive. Six-month support window so the system survives contact with your team.",
   },
 ];
 

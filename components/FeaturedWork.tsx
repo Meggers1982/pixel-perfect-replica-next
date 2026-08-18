@@ -87,7 +87,6 @@ export function FeaturedWork() {
     return () => cancelAnimationFrame(frame);
   }, [isOpen]);
 
-
   const step = useCallback(
     (delta: number) => {
       if (openIndex === null) return;
@@ -202,7 +201,6 @@ export function FeaturedWork() {
     setSlide(nearest);
   }, []);
 
-
   // In RTL the visual axis is mirrored: swiping/arrowing "right" must step
   // backwards through the projects, while logical prev/next buttons stay as-is.
   const directionFactor = useCallback(() => {
@@ -253,21 +251,16 @@ export function FeaturedWork() {
     [directionFactor, scrollToCard, slide],
   );
 
+  // With a single project there is nothing to step between: the arrows would
+  // wrap to the same card and the counter would read 01 / 01.
+  const steppable = projects.length > 1;
 
   const counterLabel = `Project ${slide + 1} of ${projects.length}: ${projects[slide]?.name ?? ""}`;
-
-
-
-
 
   return (
     <section id="work" className="border-t border-ink/15 bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8">
-        <h2
-          className="display section-title heading-flush break-words text-ink"
-        >
-          Featured Work
-        </h2>
+        <h2 className="display section-title heading-flush break-words text-ink">Featured Work</h2>
       </div>
 
       <div
@@ -336,51 +329,50 @@ export function FeaturedWork() {
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink/80">{project.note}</p>
             </div>
           </article>
-
         ))}
       </div>
 
       {/* Mobile: one project per view, stepped with arrows instead of a scrollbar. */}
-      <div
-        className="mx-auto flex max-w-[1600px] items-center gap-3 px-5 sm:hidden"
-        role="group"
-        aria-label="Featured work carousel navigation"
-      >
-        <button
-          type="button"
-          data-testid="carousel-prev"
-          onClick={() => scrollToCard(slide - 1)}
-          aria-label={`Previous project: ${
-            projects[(slide - 1 + projects.length) % projects.length]?.name ?? ""
-          }`}
-          aria-controls="featured-work-track"
-          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+      {steppable && (
+        <div
+          className="mx-auto flex max-w-[1600px] items-center gap-3 px-5 sm:hidden"
+          role="group"
+          aria-label="Featured work carousel navigation"
         >
-          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          data-testid="carousel-next"
-          onClick={() => scrollToCard(slide + 1)}
-          aria-label={`Next project: ${projects[(slide + 1) % projects.length]?.name ?? ""}`}
-          aria-controls="featured-work-track"
-          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
-        >
-          <ArrowRight className="h-5 w-5" aria-hidden="true" />
-        </button>
-        <span
-          className="label-caps ml-2 text-ink/70"
-          data-testid="carousel-counter"
-          aria-hidden="true"
-        >
-          {String(slide + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
-        </span>
-        <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {counterLabel}
-        </span>
-      </div>
-
-
+          <button
+            type="button"
+            data-testid="carousel-prev"
+            onClick={() => scrollToCard(slide - 1)}
+            aria-label={`Previous project: ${
+              projects[(slide - 1 + projects.length) % projects.length]?.name ?? ""
+            }`}
+            aria-controls="featured-work-track"
+            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+          >
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            data-testid="carousel-next"
+            onClick={() => scrollToCard(slide + 1)}
+            aria-label={`Next project: ${projects[(slide + 1) % projects.length]?.name ?? ""}`}
+            aria-controls="featured-work-track"
+            className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+          >
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <span
+            className="label-caps ml-2 text-ink/70"
+            data-testid="carousel-counter"
+            aria-hidden="true"
+          >
+            {String(slide + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
+          </span>
+          <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {counterLabel}
+          </span>
+        </div>
+      )}
 
       <DialogPrimitive.Root
         open={isOpen}
@@ -424,35 +416,39 @@ export function FeaturedWork() {
             {active ? (
               <div className="mx-auto flex min-h-full max-w-[1400px] flex-col px-5 py-6 sm:px-8 sm:py-8">
                 <div className="flex items-center justify-between">
-                  <div
-                    className="flex items-center gap-2"
-                    role="group"
-                    aria-label="Project navigation"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => step(-1)}
-                      aria-label={`Previous project: ${prevProject?.name ?? ""}`}
-                      aria-controls="work-lightbox-detail"
-                      className="flex h-11 w-11 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+                  {steppable ? (
+                    <div
+                      className="flex items-center gap-2"
+                      role="group"
+                      aria-label="Project navigation"
                     >
-                      <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => step(1)}
-                      aria-label={`Next project: ${nextProject?.name ?? ""}`}
-                      aria-controls="work-lightbox-detail"
-                      className="flex h-11 w-11 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
-                    >
-                      <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                    </button>
-                    <span className="label-caps ml-3 text-ink/70">
-                      <span className="sr-only">Project </span>
-                      {String(openIndexRef.current + 1).padStart(2, "0")} /{" "}
-                      {String(projects.length).padStart(2, "0")}
-                    </span>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => step(-1)}
+                        aria-label={`Previous project: ${prevProject?.name ?? ""}`}
+                        aria-controls="work-lightbox-detail"
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+                      >
+                        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => step(1)}
+                        aria-label={`Next project: ${nextProject?.name ?? ""}`}
+                        aria-controls="work-lightbox-detail"
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-ink hover:text-cream"
+                      >
+                        <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                      <span className="label-caps ml-3 text-ink/70">
+                        <span className="sr-only">Project </span>
+                        {String(openIndexRef.current + 1).padStart(2, "0")} /{" "}
+                        {String(projects.length).padStart(2, "0")}
+                      </span>
+                    </div>
+                  ) : (
+                    <span />
+                  )}
                   <DialogPrimitive.Close
                     aria-label={`Close ${active.name} project details`}
                     className="flex h-11 w-11 cursor-pointer items-center justify-center border border-ink/20 text-ink transition-colors hover:bg-accent hover:border-accent hover:text-cream"
@@ -495,7 +491,6 @@ export function FeaturedWork() {
                       ))}
                   </div>
 
-
                   <div className="mt-8 pb-4">
                     <p className="label-caps text-accent">{active.category}</p>
                     <DialogPrimitive.Title
@@ -510,8 +505,8 @@ export function FeaturedWork() {
                   </div>
                 </div>
                 <p className="sr-only">
-                  Swipe left or right, or use the arrow keys, to move between projects. Press
-                  Escape to close.
+                  Swipe left or right, or use the arrow keys, to move between projects. Press Escape
+                  to close.
                 </p>
               </div>
             ) : null}

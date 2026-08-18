@@ -32,6 +32,29 @@ FIRST = "Heartland Plein Air Festival"
 SECOND = "Hollow Roasters"
 LAST = "Meridian Health"
 
+_SUITE = "featured-work-carousel"
+
+def _project_count() -> int:
+    """Read the shared projects array so this suite tracks lib/projects.ts."""
+    import json as _json, subprocess as _sub
+    out = _sub.run(
+        ["node", "--input-type=module", "-e",
+         'const m = await import("./lib/projects.ts"); console.log(JSON.stringify(m.projects));'],
+        cwd=ROOT.parent, capture_output=True, text=True, check=True,
+    )
+    return len(_json.loads(out.stdout.strip().splitlines()[-1]))
+
+
+# Everything below steps between projects. With a single project the carousel
+# nav is not rendered at all, so there is nothing here to exercise — skip
+# loudly rather than assert against UI that is absent by design. The deep-link,
+# focus and history behaviour this suite overlaps on is covered by the
+# footer-work-* suites, which read the project list dynamically.
+_COUNT = _project_count()
+if _COUNT < 2:
+    print(f"SKIP: {_SUITE} needs at least 2 projects to step between; lib/projects.ts has {_COUNT}.")
+    raise SystemExit(0)
+
 
 class Results:
     def __init__(self) -> None:

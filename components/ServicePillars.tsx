@@ -4,24 +4,24 @@ const strategyImage = "/images/pillar-strategy.jpg";
 
 const pillars = [
   {
-    name: "Brand Identity",
+    name: "Content Strategy & SEO",
     image: brandImage,
-    alt: "Embossed logotype on printed brand collateral",
-    copy: "Naming, logotype, typography, packaging and the full system of rules that keeps it coherent after we hand it over. Every identity ships with a written playbook and production-ready files.",
-    target: "#work",
-  },
-  {
-    name: "Digital Product",
-    image: digitalImage,
-    alt: "A website layout displayed on a laptop in a dim studio",
-    copy: "Marketing sites, storefronts and product interfaces designed and built in-house. We prototype in the browser early so decisions are made against real behavior, not static comps.",
+    alt: "A content plan and page briefs laid out in print on a studio table",
+    copy: "Content audit, message hierarchy, sitemap and a brief for every page — what it says, who it is for, and what it should make someone do. Search intent shapes the structure from the start, so ranking is not something bolted on after launch.",
     target: "#capabilities",
   },
   {
-    name: "Positioning & Strategy",
+    name: "Web & UX Design",
+    image: digitalImage,
+    alt: "A website layout displayed on a laptop in a dim studio",
+    copy: "Layout, type, navigation and the order a visitor makes decisions in. We prototype in the browser with your real content, so choices get made against real text at real widths, not lorem ipsum in a static comp.",
+    target: "#work",
+  },
+  {
+    name: "AI & GEO",
     image: strategyImage,
     alt: "A strategy workshop wall covered in notes and printed charts",
-    copy: "Category research, customer interviews, messaging hierarchy and go-to-market narrative. The output is a decision document your team can argue with, not a deck that sits unopened.",
+    copy: "Search is turning into answers. We structure content so models can parse and cite it — clean semantics, schema, and pages that state a claim plainly instead of burying it in preamble. If an AI cannot quote you, it will quote a competitor.",
     target: "#about",
   },
 ];

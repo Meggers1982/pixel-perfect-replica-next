@@ -12,7 +12,7 @@ export function Hero() {
       <div className="relative flex min-h-[100svh] w-full overflow-hidden">
         <img
           src={heroImage}
-          alt="Brand Ledger designers reviewing printed brand work in the studio"
+          alt="Brand Ledger designers reviewing page layouts and content plans in the studio"
           width={1600}
           height={1100}
           // The LCP element on every visit: fetch it ahead of the lazy pillars.
@@ -68,16 +68,16 @@ export function Hero() {
                 paddingBottom: "0.04em",
               }}
             >
-              <span>We build brands</span>
-              <span>that behave</span>
-              <span>like businesses</span>
+              <span>Found by search.</span>
+              <span>Quoted by AI.</span>
+              <span>Read by people.</span>
             </h1>
             <p
               className="label-caps mt-6 max-w-2xl leading-[1.9] text-cream"
               style={{ letterSpacing: "0.18em" }}
             >
-              Brand Ledger is a nine-person studio in Omaha working with founder-led consumer and
-              healthcare companies from first positioning through launch.
+              Brand Ledger is a content, design and search studio in Omaha. We decide what a site has
+              to say, design how it works, and make sure both people and AI can find it.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a

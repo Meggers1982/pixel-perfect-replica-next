@@ -16,7 +16,7 @@ export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://thebrandled
 export const siteName = "Brand Ledger";
 
 export const siteDescription =
-  "Omaha brand and digital studio building identity, positioning and product for founder-led consumer and healthcare companies.";
+  "Omaha studio that plans, designs and builds websites content-first: content strategy, SEO, web and UX design, and GEO so AI answers cite you.";
 
 export const contact = {
   email: "hello@thebrandledger.com",

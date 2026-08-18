@@ -11,10 +11,11 @@ import { absoluteUrl, contact, founded, founders, siteDescription, siteName, sit
 import { projects } from "@/lib/projects";
 
 const SERVICES = [
-  "Brand Identity",
-  "Digital Product",
-  "Positioning & Strategy",
-  "Packaging",
+  "Content Strategy",
+  "Search Engine Optimization",
+  "Generative Engine Optimization",
+  "Web Design",
+  "UX Design",
 ] as const;
 
 export function buildStructuredData() {
@@ -40,7 +41,6 @@ export function buildStructuredData() {
     },
     areaServed: { "@type": "Country", name: "United States" },
     knowsAbout: [...SERVICES],
-    numberOfEmployees: { "@type": "QuantitativeValue", value: 9 },
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Studio services",
