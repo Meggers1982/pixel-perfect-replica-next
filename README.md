@@ -270,6 +270,45 @@ platform (see below), so baselines should only ever be adopted from a CI run.
 
 ## Test baselines
 
+`tests/baselines/` holds 231 PNGs recorded on `ubuntu-latest` by the CI harness
+against a production build. They replaced the set inherited from the TanStack
+repo, which failed against this app on Linux for reasons that were never a
+regression: no layout offset (the difference is minimised at dx=0 dy=0), the
+same typeface at the same positions, only rasterisation differing by 1.4-5.7%,
+and byte-identical across two runs that differed in `font-display`. They
+predated the current Playwright/Chromium.
+
+**Do not record baselines on a developer machine.** `scrollbar-gutter: stable`
+reserves 15px against a classic scrollbar on Linux and 0px against macOS's
+overlay scrollbars, so every local capture is 15px narrower and will never match
+CI. Run the baseline-backed suites in CI and the behavioural ones locally; when
+a baseline legitimately needs updating, take it from the `recorded-baselines`
+artifact.
+
+## Carried-over lint warnings
+
+`npm run lint` reports 0 errors and 11 warnings. They are all patterns carried
+over verbatim from the TanStack build — `set-state-in-effect` in the SSR-safe
+"sync after mount" hooks, `refs` in FeaturedWork's focus-restore mirror, `purity`
+in shadcn's untouched `sidebar.tsx`. `eslint.config.mjs` documents each one.
+They are worth revisiting, but the Playwright suite pins the behaviour they
+produce, so they are warnings rather than errors.
+
+## CI
+
+`.github/workflows/hero-visual-regression.yml` runs the whole Playwright suite
+against a production build on `ubuntu-latest`, on pushes to `main`, on pull
+requests, and on demand.
+
+**Baselines that are missing get recorded and the suite passes.** That is what
+makes a first run green, and it is also a trap: a suite with no committed
+baseline compares nothing. The run uploads a `recorded-baselines` artifact for
+exactly this reason — download it, commit the contents, and the next run becomes
+a real comparison. Anything captured on a developer machine is the wrong
+platform (see below), so baselines should only ever be adopted from a CI run.
+
+## Test baselines
+
 `tests/baselines/` still holds the PNGs recorded from the TanStack app on CI
 Linux. Keep them: on `ubuntu-latest` they double as a cross-framework pixel
 check. They do **not** reproduce on macOS — `scrollbar-gutter: stable` reserves
