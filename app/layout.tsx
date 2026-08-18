@@ -49,10 +49,11 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: {
-    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
-  },
+  // No `icons` block on purpose. app/favicon.ico, app/icon.svg and
+  // app/apple-icon.png are file conventions, so Next emits the <link> tags
+  // itself with content-hashed URLs. Declaring them here as well produced a
+  // second, unhashed set of tags pointing at the same files — and the old
+  // entry pointed at public/favicon.ico, which was still Lovable's logo.
   formatDetection: { telephone: false },
 };
 
