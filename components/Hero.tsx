@@ -31,7 +31,11 @@ export function Hero() {
           }}
         />
 
-        <div className="relative z-10 flex w-full items-center px-5 pb-12 pt-24 sm:px-8 sm:pt-28 lg:pt-32">
+        {/* pb-20 from the height where the cue appears, so it has its own band
+            and cannot land on the CTA row. Reserving it unconditionally instead
+            grew the stage past the viewport on phones and pushed the cue below
+            the fold, which is worse than not drawing it. */}
+        <div className="relative z-10 flex w-full items-center px-5 pb-12 pt-24 [@media(min-height:780px)]:pb-20 sm:px-8 sm:pt-28 lg:pt-32">
           <div className="mx-auto w-full max-w-[1600px]">
             {/* Wide enough to hold the longest line at the upper bound of the
                 clamp, so the nowrap spans never spill the block. "Experienced
@@ -45,7 +49,7 @@ export function Hero() {
                 Content · Design · Search — Omaha, Nebraska
               </p>
               <h1
-                className="display mt-6 text-cream [&>span]:block md:[&>span]:whitespace-nowrap"
+                className="display mt-6 leading-[1.04] text-cream [&>span]:block md:leading-[0.93] md:[&>span]:whitespace-nowrap"
                 style={{
                   // The old 6.25rem ceiling was reached at ~1515px, so on anything
                   // wider the masthead stopped growing and shrank into the corner
@@ -97,12 +101,17 @@ export function Hero() {
         {/* A full-height hero gives no visual signal that the page continues,
             so mark the edge. It is a real link rather than decoration: an
             affordance that looks clickable but cannot be reached by keyboard
-            is worse than none. Hidden on short viewports, where it would
-            crowd the CTAs. */}
+            is worse than none.
+            
+            The threshold is 780px rather than 640px because the headline now
+            wraps to four rows on a phone: below that the hero is taller than
+            the viewport, so the cue rendered either on top of the CTAs or
+            below the fold. On those viewports the CTA row already sits at the
+            bottom edge, which signals the same thing without a label. */}
         <a
           href="#services"
           aria-label="Scroll to services"
-          className="group absolute inset-x-0 bottom-0 z-10 hidden [@media(min-height:640px)]:block"
+          className="group absolute inset-x-0 bottom-0 z-10 hidden [@media(min-height:780px)]:block"
         >
           <span className="mx-auto flex max-w-[1600px] items-center gap-3 px-5 pb-8 sm:px-8 sm:pb-10">
             <span className="label-caps text-cream/70 transition-colors group-hover:text-cream">
