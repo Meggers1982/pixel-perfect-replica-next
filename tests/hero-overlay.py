@@ -1,13 +1,19 @@
 """Hero H1 overlay suite.
 
-Guarantees the hero headline stays *on* the hero image — never below it —
-and that the overlay copy stays readable against the photograph.
+Guarantees the hero headline stays *inside* the hero stage — never below it —
+and that the overlay copy stays readable against whatever is painted behind it.
+
+The stage used to be a photograph and these checks were written against
+`section#top img`. The hero is now a flat ink field with no image, so the
+bounding box they measure against is the stage element itself. The property
+under test is unchanged: the H1 must sit within the first view, painted above
+the stage, clear of the CTA row, and clearing WCAG AA against its backdrop.
 
 Checks per viewport (and per browser):
   1. Semantics  — exactly one <h1> on the page, and it is the hero headline.
-  2. Overlay    — the H1 box is fully inside the hero image box, is painted
+  2. Overlay    — the H1 box is fully inside the hero stage box, is painted
                   above it (stacking context / elementFromPoint hit test),
-                  and its bottom never crosses the image's bottom edge.
+                  and its bottom never crosses the stage's bottom edge.
   3. Wrapping   — the headline still renders on exactly three visual lines
                   with the eyebrow/CTA sharing its left edge.
   4. Contrast   — text colour vs. the *actual pixels behind it* (text hidden,
@@ -53,6 +59,33 @@ TARGET_URL = BASE_URL + PROFILE.get("path", "/")
 
 SEL = CONFIG["selectors"]
 EXPECTED_LINES = [line.upper() for line in CONFIG["expectedLines"]]
+
+# Below the wrap breakpoint the headline spans are allowed to wrap, and how
+# many rows they take depends on the width: "Experienced by people." needs two
+# rows at 320-413px and one from 414px. There is no single correct count there,
+# so the exact-count assertion only applies at and above the breakpoint. The
+# span text is still asserted at every width, as is the overflow check below —
+# which is the property that actually regressed when the line got longer.
+WRAP_BREAKPOINT = CONFIG.get("wrapBreakpoint")
+
+
+def expected_visual_lines(width: int) -> int | None:
+    """Rows the H1 must occupy, or None where wrapping makes it width-dependent."""
+    if WRAP_BREAKPOINT is not None and width < WRAP_BREAKPOINT:
+        return None
+    return len(EXPECTED_LINES)
+
+
+# getClientRects() on a *block* element returns one rect for the whole box, so
+# counting it per span reports the number of spans (always 3) no matter how the
+# text wraps. A Range over each span's contents returns one rect per line box,
+# which is the number this is meant to be checking.
+COUNT_ROWS_JS = """(el, sel) => [...el.querySelectorAll(sel)].reduce((n, s) => {
+  const r = document.createRange();
+  r.selectNodeContents(s);
+  return n + r.getClientRects().length;
+}, 0)"""
+
 PADDING_TOLERANCE = CONFIG["paddingTolerance"]
 PIXEL_THRESHOLD = CONFIG["pixelThreshold"]
 MAX_DIFF_RATIO = CONFIG["maxDiffRatio"]
@@ -203,13 +236,12 @@ async def run_case(browser, engine, view, orientation):
         failures.append(f"{key}: hero contains {in_hero} <h1>, want 1")
 
     h1 = page.locator("h1").first
-    img = page.locator(f'{SEL["hero"]} img').first
 
     # 2. overlay geometry + paint order
     geom = await page.evaluate(
         """([heroSel]) => {
           const h1 = document.querySelector('h1');
-          const img = document.querySelector(heroSel + ' img');
+          const img = document.querySelector(heroSel);
           const hb = h1.getBoundingClientRect();
           const ib = img.getBoundingClientRect();
           const cx = hb.x + hb.width / 2, cy = hb.y + hb.height / 2;
@@ -234,13 +266,13 @@ async def run_case(browser, engine, view, orientation):
 
     if hb["y"] < ib["y"] - 1 or hb["bottom"] > ib["bottom"] + 1:
         failures.append(
-            f"{key}: H1 vertically escapes the hero image "
+            f"{key}: H1 vertically escapes the hero stage "
             f"(h1 {hb['y']:.0f}-{hb['bottom']:.0f} vs img {ib['y']:.0f}-{ib['bottom']:.0f})"
         )
     if hb["x"] < ib["x"] - 1 or hb["right"] > ib["right"] + 1:
-        failures.append(f"{key}: H1 horizontally escapes the hero image")
+        failures.append(f"{key}: H1 horizontally escapes the hero stage")
     if hb["y"] >= ib["bottom"]:
-        failures.append(f"{key}: H1 renders BELOW the hero image")
+        failures.append(f"{key}: H1 renders BELOW the hero stage")
     if not geom["overlaysImage"]:
         failures.append(
             f"{key}: H1 is not the painted element at its own centre (hit <{geom['hitTag']}>)"
@@ -249,15 +281,16 @@ async def run_case(browser, engine, view, orientation):
 
     # 3. wrapping + left-edge alignment
     lines = [t.strip().upper() for t in await h1.locator(SEL["headlineLine"]).all_inner_texts()]
-    visual_lines = await h1.evaluate(
-        "(el, s) => [...el.querySelectorAll(s)].reduce((n, x) => n + x.getClientRects().length, 0)",
-        SEL["headlineLine"],
-    )
+    visual_lines = await h1.evaluate(COUNT_ROWS_JS, SEL["headlineLine"])
     meta["lines"] = visual_lines
     if lines != EXPECTED_LINES:
         failures.append(f"{key}: headline text {lines} != {EXPECTED_LINES}")
-    if visual_lines != len(EXPECTED_LINES):
-        failures.append(f"{key}: headline on {visual_lines} visual lines, want {len(EXPECTED_LINES)}")
+    want_visual = expected_visual_lines(width)
+    if want_visual is not None and visual_lines != want_visual:
+        failures.append(f"{key}: headline on {visual_lines} visual lines, want {want_visual}")
+    h1_overflow = await h1.evaluate("el => el.scrollWidth - el.clientWidth")
+    if h1_overflow > 1:
+        failures.append(f"{key}: headline overflows its measure by {h1_overflow}px")
 
     boxes = {
         "h1": hb,

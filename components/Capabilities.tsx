@@ -37,7 +37,13 @@ export function Capabilities() {
           {capabilities.map((item) => (
             <li
               key={item.step}
-              className="grid gap-4 border-b border-cream/25 py-8 md:grid-cols-[120px_260px_1fr] md:items-baseline md:gap-10"
+              // items-baseline lined the three columns up on their baselines,
+              // which for type this mismatched in size meant three different
+              // starting heights: the number's cap-top sat 18px above the
+              // title's and the copy's sat 19px below it. items-start puts the
+              // number and title cap-tops within 1px of each other (Anton's
+              // 0.93 line-height leaves almost no half-leading above the caps).
+              className="grid gap-4 border-b border-cream/25 py-8 md:grid-cols-[120px_260px_1fr] md:items-start md:gap-10"
             >
               <span
                 className="display text-accent-on-dark"
@@ -51,7 +57,15 @@ export function Capabilities() {
               >
                 {item.title}
               </h3>
-              <p className="max-w-2xl text-base leading-relaxed text-cream/85">{item.copy}</p>
+              {/* Barlow at leading-relaxed carries ~7.4px of half-leading above
+                  its cap-height, so aligning the boxes still leaves the copy
+                  sitting low. 0.46em of its own size trims exactly that, which
+                  holds at every breakpoint because this column's type size is
+                  fixed. Only from md, where the columns are actually side by
+                  side — stacked, it would just eat the row gap. */}
+              <p className="max-w-2xl text-base leading-relaxed text-cream/85 md:-mt-[0.46em]">
+                {item.copy}
+              </p>
             </li>
           ))}
         </ol>

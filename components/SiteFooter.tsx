@@ -125,7 +125,7 @@ export function SiteFooter() {
             onSubmit={onSubmit}
             action={formEndpoint}
             method="POST"
-            className="space-y-5"
+            className="space-y-5 border-2 border-ink bg-cream p-6 text-ink sm:p-8"
           >
             {/* Names the notification email in the Formspree inbox. */}
             <input type="hidden" name="_subject" value={`New inquiry — ${siteName}`} />
@@ -147,7 +147,7 @@ export function SiteFooter() {
                   name="name"
                   autoComplete="name"
                   data-lpignore="true"
-                  className="mt-2 w-full border-b border-accent-foreground/70 bg-transparent py-3 text-base outline-none placeholder:text-accent-foreground/75 focus:border-accent-foreground"
+                  className="mt-2 w-full border-b-2 border-ink/25 bg-transparent py-3 text-base outline-none placeholder:text-ink/45 focus:border-accent"
                   placeholder="Jane Doe"
                 />
               </label>
@@ -159,7 +159,7 @@ export function SiteFooter() {
                   name="email"
                   autoComplete="email"
                   data-lpignore="true"
-                  className="mt-2 w-full border-b border-accent-foreground/70 bg-transparent py-3 text-base outline-none placeholder:text-accent-foreground/75 focus:border-accent-foreground"
+                  className="mt-2 w-full border-b-2 border-ink/25 bg-transparent py-3 text-base outline-none placeholder:text-ink/45 focus:border-accent"
                   placeholder="jane@company.com"
                 />
               </label>
@@ -171,7 +171,7 @@ export function SiteFooter() {
                 name="project"
                 rows={4}
                 data-lpignore="true"
-                className="mt-2 w-full resize-none border-b border-accent-foreground/70 bg-transparent py-3 text-base outline-none placeholder:text-accent-foreground/75 focus:border-accent-foreground"
+                className="mt-2 w-full resize-none border-b-2 border-ink/25 bg-transparent py-3 text-base outline-none placeholder:text-ink/45 focus:border-accent"
                 placeholder="Scope, timing, and budget range"
               />
             </label>
@@ -183,7 +183,7 @@ export function SiteFooter() {
                 type="submit"
                 disabled={submitting}
                 aria-busy={submitting}
-                className="label-caps bg-accent-foreground px-8 py-4 text-accent transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-70"
+                className="label-caps bg-ink px-8 py-4 text-cream transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {status === "submitting"
                   ? "Sending…"
@@ -199,7 +199,7 @@ export function SiteFooter() {
               {/* A failed send has to be visible, not just a toast that expires
                   — the visitor's message is still sitting in the form. */}
               {status === "error" && errorMessage ? (
-                <p role="alert" className="mt-4 max-w-md text-sm leading-relaxed">
+                <p role="alert" className="mt-4 max-w-md text-sm leading-relaxed text-accent">
                   {errorMessage}
                 </p>
               ) : null}

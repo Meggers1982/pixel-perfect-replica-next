@@ -1,99 +1,95 @@
-// Plain <img> against /public: the scrim and object-cover crop do all the work,
-// so next/image's srcset/sizes rewriting would only risk shifting the render.
-const heroImage = "/images/hero.jpg";
-
+/**
+ * Typographic hero: a flat ink field, no photograph.
+ *
+ * The previous version laid the headline over a stock studio interior and
+ * needed three stacked scrim layers to stay legible — a right-to-left ink
+ * gradient, a flat wash and a bottom fade — all of which existed only to
+ * darken a photograph nobody could really see anyway. Removing the image
+ * removes the scrims, removes a 248KB LCP fetch, and lets the Anton headline
+ * be the loudest thing on the page, which is the point of the hero.
+ *
+ * What replaces the photograph is structure rather than decoration: a hairline
+ * column grid, an eyebrow, and a red rule marking the break between the
+ * headline and the standfirst.
+ */
 export function Hero() {
   return (
     <section id="top" className="relative">
-      {/* Hero stage: full-bleed image with headline, description and CTAs overlaid.
-          `min-h` rather than a fixed height, so a short landscape phone lets the
+      {/* `min-h` rather than a fixed height, so a short landscape phone lets the
           stage grow instead of clipping the CTAs; `svh` rather than `vh`, so
           mobile browser chrome cannot make the first view overflow and jump. */}
-      <div className="relative flex min-h-[100svh] w-full overflow-hidden">
-        <img
-          src={heroImage}
-          alt="Brand Ledger designers reviewing page layouts and content plans in the studio"
-          width={1600}
-          height={1100}
-          // The LCP element on every visit: fetch it ahead of the lazy pillars.
-          fetchPriority="high"
-          // A portrait phone crops this landscape frame to roughly its middle
-          // third, which lands on empty desk — the studio and the people sit
-          // right of centre. Bias the crop there until the viewport is wide
-          // enough to show them anyway.
-          className="absolute inset-0 h-full w-full object-cover object-[75%_50%] md:object-center"
-        />
-        {/* Scrim: directional wash that stays dense behind the copy on the left
-            and clears toward the right so the photograph reads. The three layers
-            multiply, so the far right used to land ~51% darkened and the whole
-            lower third was crushed to flat black — at full height that dead band
-            is most of the stage. The right now clears to ~34% and the bottom fade
-            is confined to the last 28%, where it resolves into solid ink so the
-            hero meets the ink section below without a seam. */}
-        <div className="absolute inset-0 bg-ink/50 md:bg-ink/25" />
-        {/* Pixel stops, not percentages. The copy column is width-capped
-            (max-w-2xl), but a percentage-based wash clears at a fixed fraction
-            of the viewport — so around 812px the standfirst ran past the dense
-            zone onto a lit window and measured 4.16:1, under AA for 11.5px
-            text. Anchoring the stops in px keeps the dense zone over the copy
-            at every width while still clearing for the photograph on wide
-            screens. */}
+      <div className="relative flex min-h-[100svh] w-full overflow-hidden bg-ink">
+        {/* Hairline column grid. Decorative, and faint enough that it reads as
+            paper rule rather than as a table — it gives the empty right half a
+            measure without competing with the type. */}
         <div
-          className="absolute inset-0"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden md:block"
           style={{
-            backgroundImage: [
-              "linear-gradient(to right,",
-              "color-mix(in oklab, var(--ink) 92%, transparent) 0px,",
-              "color-mix(in oklab, var(--ink) 78%, transparent) 780px,",
-              "color-mix(in oklab, var(--ink) 12%, transparent) 1500px)",
-            ].join(" "),
+            backgroundImage:
+              "repeating-linear-gradient(to right, color-mix(in oklab, var(--cream) 7%, transparent) 0 1px, transparent 1px 12.5%)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink from-0% via-transparent via-28% to-transparent" />
 
         <div className="relative z-10 flex w-full items-center px-5 pb-12 pt-24 sm:px-8 sm:pt-28 lg:pt-32">
           <div className="mx-auto w-full max-w-[1600px]">
-            {/* Wide enough to hold the longest line at the new upper bound
-                (6.4 x font-size), so the nowrap spans never spill the block. */}
-            <div className="max-w-[68rem]">
-            <h1
-              className="display text-cream [&>span]:block [&>span]:whitespace-nowrap"
-              style={{
-                // The old 6.25rem ceiling was reached at ~1515px, so on anything
-                // wider the masthead stopped growing and shrank into the corner
-                // of an ever-larger dark field. 6.6vw now runs to ~2180px.
-                fontSize: "clamp(2.6rem, 6.6vw, 9rem)",
-                marginLeft: "-0.045em",
-                paddingTop: "0.02em",
-                paddingBottom: "0.04em",
-              }}
-            >
-              <span>Found by search.</span>
-              <span>Quoted by AI.</span>
-              <span>Read by people.</span>
-            </h1>
-            <p
-              className="label-caps mt-6 max-w-2xl leading-[1.9] text-cream"
-              style={{ letterSpacing: "0.18em" }}
-            >
-              Brand Ledger is a content, design and search studio in Omaha. We decide what a site has
-              to say, design how it works, and make sure both people and AI can find it.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a
-                href="#contact"
-                className="label-caps inline-flex w-full max-w-xs items-center justify-center bg-cream px-7 py-4 text-ink transition-opacity hover:opacity-85 sm:w-auto sm:max-w-none sm:justify-start"
+            {/* Wide enough to hold the longest line at the upper bound of the
+                clamp, so the nowrap spans never spill the block. "Experienced
+                by people." sets that bound at 8.83 x font-size — 1271px at the
+                9rem ceiling — which is what 82rem leaves room for. 68rem used
+                to be enough when the third line read "Read by people."; it is
+                not any more, and the overflow was being silently clipped by
+                the stage's overflow-hidden rather than showing as a scrollbar. */}
+            <div className="max-w-[82rem]">
+              <p className="label-caps text-accent-on-dark">
+                Content · Design · Search — Omaha, Nebraska
+              </p>
+              <h1
+                className="display mt-6 text-cream [&>span]:block md:[&>span]:whitespace-nowrap"
+                style={{
+                  // The old 6.25rem ceiling was reached at ~1515px, so on anything
+                  // wider the masthead stopped growing and shrank into the corner
+                  // of an ever-larger dark field. 6.6vw now runs to ~2180px.
+                  //
+                  // Below md the spans are allowed to wrap, so the floor is no
+                  // longer hostage to the longest line — "Experienced by
+                  // people." breaks over two rows on a phone and the type stays
+                  // at the size it was. From md up the spans are nowrap again
+                  // and the headline holds its three-line shape.
+                  fontSize: "clamp(2.6rem, 6.6vw, 9rem)",
+                  marginLeft: "-0.045em",
+                  paddingTop: "0.02em",
+                  paddingBottom: "0.04em",
+                }}
               >
-                Start a Project
-              </a>
-              <a
-                href="#work"
-                className="label-caps inline-flex w-full max-w-xs items-center justify-center border border-cream px-7 py-4 text-cream transition-colors hover:bg-cream hover:text-ink sm:w-auto sm:max-w-none sm:justify-start"
+                <span>Found by search.</span>
+                <span>Quoted by AI.</span>
+                <span>Experienced by people.</span>
+              </h1>
+              {/* The one piece of brand red above the fold: it marks the break
+                  between the claim and the explanation. */}
+              <div aria-hidden="true" className="mt-8 h-[6px] w-24 bg-accent" />
+              <p
+                className="label-caps mt-6 max-w-2xl leading-[1.9] text-cream"
+                style={{ letterSpacing: "0.18em" }}
               >
-                See the Work
-              </a>
-            </div>
-
+                Brand Ledger is a content, design and search studio in Omaha. We decide what a site
+                has to say, design how it works, and make sure both people and AI can find it.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <a
+                  href="#contact"
+                  className="label-caps inline-flex w-full max-w-xs items-center justify-center bg-cream px-7 py-4 text-ink transition-opacity hover:opacity-85 sm:w-auto sm:max-w-none sm:justify-start"
+                >
+                  Start a Project
+                </a>
+                <a
+                  href="#work"
+                  className="label-caps inline-flex w-full max-w-xs items-center justify-center border border-cream px-7 py-4 text-cream transition-colors hover:bg-cream hover:text-ink sm:w-auto sm:max-w-none sm:justify-start"
+                >
+                  See the Work
+                </a>
+              </div>
             </div>
           </div>
         </div>

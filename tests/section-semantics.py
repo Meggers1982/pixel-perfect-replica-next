@@ -6,7 +6,7 @@ For every breakpoint (plus short-height viewports) and both orientations:
   2. no skipped heading levels, no empty headings
   3. every section (hero, pillars, work, capabilities, about, footer) owns a heading
   4. axe-core: heading-order, landmark-one-main, page-has-heading-one, color-contrast
-  5. on short viewports the hero overlay copy stays inside the hero image and
+  5. on short viewports the hero overlay copy stays inside the hero stage and
      does not overlap the CTA row
 
 Usage:
@@ -135,11 +135,13 @@ async def run_case(browser, engine, view, orientation):
         elif count == 0:
             failures.append(f"{key}: section {sel} has no heading")
 
-    # hero overlay geometry on short viewports
+    # Hero overlay geometry on short viewports. Measured against the hero
+    # stage rather than a hero <img> — the hero is a flat ink field now, so the
+    # stage element is what defines the first view's bounds.
     geom = await page.evaluate(
         """() => {
           const h1 = document.querySelector('h1');
-          const img = document.querySelector('section#top img');
+          const img = document.querySelector('section#top');
           const cta = document.querySelector('section#top a[href="#contact"]');
           const r = e => { const b = e.getBoundingClientRect();
             return {x: b.x, y: b.y, bottom: b.bottom, right: b.right, width: b.width, height: b.height}; };
@@ -148,7 +150,7 @@ async def run_case(browser, engine, view, orientation):
     )
     h1b, imgb, ctab = geom["h1"], geom["img"], geom["cta"]
     if h1b["bottom"] > imgb["bottom"] + 1 or h1b["y"] < imgb["y"] - 1:
-        failures.append(f"{key}: hero H1 escapes the hero image vertically")
+        failures.append(f"{key}: hero H1 escapes the hero stage vertically")
     if h1b["bottom"] > ctab["y"] + 1:
         failures.append(f"{key}: hero H1 overlaps the CTA row")
 

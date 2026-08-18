@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { Analytics } from "@/components/Analytics";
 import { Providers } from "@/app/providers";
 import { defaultOgImage, defaultOgImageAlt } from "@/lib/seo";
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );

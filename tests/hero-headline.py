@@ -114,6 +114,33 @@ TARGET_URL = BASE_URL + PROFILE.get("path", "/")
 
 SEL = CONFIG["selectors"]
 EXPECTED_LINES = [line.upper() for line in CONFIG["expectedLines"]]
+
+# Below the wrap breakpoint the headline spans are allowed to wrap, and how
+# many rows they take depends on the width: "Experienced by people." needs two
+# rows at 320-413px and one from 414px. There is no single correct count there,
+# so the exact-count assertion only applies at and above the breakpoint. The
+# span text is still asserted at every width, as is the overflow check below —
+# which is the property that actually regressed when the line got longer.
+WRAP_BREAKPOINT = CONFIG.get("wrapBreakpoint")
+
+
+def expected_visual_lines(width: int) -> int | None:
+    """Rows the H1 must occupy, or None where wrapping makes it width-dependent."""
+    if WRAP_BREAKPOINT is not None and width < WRAP_BREAKPOINT:
+        return None
+    return len(EXPECTED_LINES)
+
+
+# getClientRects() on a *block* element returns one rect for the whole box, so
+# counting it per span reports the number of spans (always 3) no matter how the
+# text wraps. A Range over each span's contents returns one rect per line box,
+# which is the number this is meant to be checking.
+COUNT_ROWS_JS = """(el, sel) => [...el.querySelectorAll(sel)].reduce((n, s) => {
+  const r = document.createRange();
+  r.selectNodeContents(s);
+  return n + r.getClientRects().length;
+}, 0)"""
+
 PADDING_TOLERANCE = CONFIG["paddingTolerance"]
 PIXEL_THRESHOLD = CONFIG["pixelThreshold"]
 MAX_DIFF_RATIO = CONFIG["maxDiffRatio"]
@@ -280,20 +307,35 @@ async def attempt_viewport(browser, view, write_diff: bool) -> tuple[list[str], 
         "(el, sel) => [...el.querySelectorAll(sel)].map(s => s.getBoundingClientRect().height)",
         line_sel,
     )
-    visual_lines = await h1.evaluate(
-        "(el, sel) => [...el.querySelectorAll(sel)]"
-        ".reduce((n, s) => n + s.getClientRects().length, 0)",
-        line_sel,
-    )
+    visual_lines = await h1.evaluate(COUNT_ROWS_JS, line_sel)
 
     if lines != EXPECTED_LINES:
         failures.append(f"{name}: headline text {lines} != {EXPECTED_LINES}")
-    if visual_lines != len(EXPECTED_LINES):
+    want_visual = expected_visual_lines(width)
+    if want_visual is not None and visual_lines != want_visual:
         failures.append(
-            f"{name}: headline rendered on {visual_lines} visual lines, want {len(EXPECTED_LINES)}"
+            f"{name}: headline rendered on {visual_lines} visual lines, want {want_visual}"
         )
-    if len(set(round(h) for h in heights)) != 1:
-        failures.append(f"{name}: uneven line heights {heights}")
+    # Applies at every width, wrapping or not: a headline wider than its measure
+    # is clipped by the hero stage's overflow-hidden rather than showing as a
+    # page scrollbar, so nothing else here would catch it.
+    h1_overflow = await h1.evaluate("el => el.scrollWidth - el.clientWidth")
+    if h1_overflow > 1:
+        failures.append(f"{name}: headline overflows its measure by {h1_overflow}px")
+    # Per-row height, not per-span: below the wrap breakpoint one span occupies
+    # two rows and is legitimately twice as tall. Dividing by each span's own
+    # row count compares like with like at every width.
+    rows = await h1.evaluate(
+        """(el, sel) => [...el.querySelectorAll(sel)].map(s => {
+             const r = document.createRange();
+             r.selectNodeContents(s);
+             return r.getClientRects().length;
+           })""",
+        line_sel,
+    )
+    row_heights = [h / r for h, r in zip(heights, rows) if r]
+    if len(set(round(h) for h in row_heights)) != 1:
+        failures.append(f"{name}: uneven line heights {row_heights}")
 
     boxes = {
         "h1": await h1.bounding_box(),

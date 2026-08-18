@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const STORAGE_KEY = "nb-cookie-consent";
+import {
+  CONSENT_STORAGE_KEY as STORAGE_KEY,
+  setAnalyticsConsent,
+  type ConsentChoice,
+} from "@/lib/analytics";
 
 export function CookieBar() {
   const [visible, setVisible] = useState(false);
@@ -30,8 +34,11 @@ export function CookieBar() {
 
   if (!visible) return null;
 
-  const dismiss = (value: string) => {
+  // Decline used to only hide the bar. It now reaches GA too, so the choice
+  // the banner offers is the choice that actually gets made.
+  const dismiss = (value: ConsentChoice) => {
     localStorage.setItem(STORAGE_KEY, value);
+    setAnalyticsConsent(value);
     setVisible(false);
   };
 
